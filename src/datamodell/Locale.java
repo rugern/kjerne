@@ -17,5 +17,9 @@ public class Locale {
 	public void removeReserved(Time start, Time end) {
 		
 	}
+	
+	public boolean[][] getReservationTable() {
+		return reservationTable;
+	}
 
 }

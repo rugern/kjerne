@@ -5,7 +5,9 @@ import java.util.ArrayList;
 
 public class Locales {
 	
-	public ArrayList getLocales(Time start, Time end) {
+	
+	
+	public boolean[][] getLocales(Time start, Time end) {
 		
 	}
 	

@@ -47,7 +47,6 @@ public class Event {
 	
 	public boolean[][] getAvailableLocales(Time start, Time end) {
 		return locales.getLocales(start, end);
-		
 	}
 
 }
