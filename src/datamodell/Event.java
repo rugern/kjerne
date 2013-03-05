@@ -19,40 +19,49 @@ public class Event {
 		locales = new Locales();	
 	}
 	
-	public Employee[] getEmployeeList() { //Get employees from database
-		return employees;
+	//Need to get employees from database, implement later
+	public Employee[] getEmployeeList() { 
+		
 	}
 	
+	//Not final, but guessing call to employee-class to notify about event
 	public void eventInvitation() {
 		for(Employee e: participants) {
 			e.inviteToEvent(this);
 		}
 	}
 	
+	//Not final, but guessing call to employee-class to notify about event
 	public void notifyDelete() {
 		for(Employee e: participants) {
 			e.notifyDeleteEvent(this);
 		}
 	}
 	
-//Reserve location in locales and set locale here
+	//Reserve location in locales and set locale field here
 	public void reserveLocale(Locale locale, Time start, Time end) {
 		locales.setReservedLocale(locale, start, end);
 		setLocale(locale);
 	}
 
-//Reserve name as location (location is not meeting room)
+	//Reserve a name as location (location is not a meeting room)
 	public void reserveLocale(String name, Time start, Time end) {
 		Locale l = new Locale(name);
 		locales.setReservedLocale(l, start, end);
 		setLocale(l);
 	}
 
-//Returns available locales as boolean table (1 is reserved, 0 is not)
+	//Not final, this returns available locales as boolean table (1 is reserved, 0 is not)
 	public boolean[][] getAvailableLocales(Time start, Time end) {
 		return locales.getLocales(start, end);
 	}
 
+	//Add participants to event
+	public void addParticipants(Employee participant) {
+		participants.add(participant);
+	}
+
+	//Only getters and setters from here and down
 	public int getID() {
 		return ID;
 	}
@@ -103,10 +112,6 @@ public class Event {
 	
 	public List<Employee> getParticipants() {
 		return participants;
-	}
-	
-	public void addParticipants(Employee participant) {
-		participants.add(participant);
 	}
 	
 	public Locales getLocales() {
