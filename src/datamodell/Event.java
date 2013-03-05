@@ -21,28 +21,28 @@ public class Event {
 		
 	}
 	
-	public ArrayList getEmployeeList() {
-		return null;
+	public Employee[] getEmployeeList() { //Get employees from database
+		return employees;
 	}
 	
 	public void eventInvitation() {
 		for(Employee e: participants) {
-			e.invite(this);
+			e.inviteToEvent(this);
 		}
 	}
 	
 	public void notifyDelete() {
 		for(Employee e: participants) {
-			e.notifyDelete(this);
+			e.notifyDeleteEvent(this);
 		}
 	}
 	
-	public void reserveLocale(Locale locale, Time start, Time end) {
-		
+	public void reserveLocale(datamodell.Locale locale, Time start, Time end) {
+		locales.setReservedLocale(locale, start, end);
 	}
 	
 	public void reserveLocale(String name, Time start, Time end) {
-		
+		locales.setReservedLocale(name, start, end);
 	}
 	
 	public boolean[][] getAvailableLocales(Time start, Time end) {
