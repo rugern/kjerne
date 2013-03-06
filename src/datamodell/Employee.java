@@ -9,5 +9,4 @@ public class Employee extends EventMaker {
 	}
 
 	private int ssn;
-
 }

@@ -22,6 +22,7 @@ public class Event {
 	//Need to get employees from database, implement later
 	public Employee[] getEmployeeList() { 
 		
+		return null; //TODO
 	}
 	
 	//Not final, but guessing call to employee-class to notify about event

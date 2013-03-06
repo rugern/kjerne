@@ -7,5 +7,4 @@ public class Group extends EventMaker {
 	}
 
 	private int ID;
-
 }
