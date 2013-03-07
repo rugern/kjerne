@@ -1,5 +1,7 @@
 package datamodell;
 
+import java.sql.Time;
+
 public class Locale {
 	
 	private int ID;

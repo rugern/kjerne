@@ -1,23 +1,36 @@
 package datamodell;
 
-public class EventMaker {
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * EventMaker is the abstract superclass of both Employee and Group. An EventMaker object has
+ * personal list of Event(s) that the person is participating in. The calendar boolean
+ * 2D array is used for quick lookup of EventMaker's events (used in determining
+ * whether or not EventMaker is available on a given date). 
+ * Also of note is the invitations field, this stores events that haven't been responded to yet.
+ * 
+ * Note: consider changing name of class to something less ambiguous
+ * @author Jama
+ */
+public abstract class EventMaker {
 	
 	private String email;
 	private boolean[][] calendar;
+	private List<Event> events; //list of events this user is connected to
+	private List<Event> invitations; //TODO ensure accept and decline is handled
+	private List<String> deletes; //A quick toString of an event right before deletion ensures that the user knows what has been deleted, once user is notified, delete the string from this list as well.
 	
 	public EventMaker(String email) {
-		this.email = email;
+		this.setEmail(email);
 	}
 	
 	/**
-	 * Log in method. The username and password is checked, throws exception if error.
-	 * @param username
-	 * @param password
-	 * @throws WrongPasswordException if password wrong, UserNameNotFoundException 
-	 * if username not found.
+	 * @deprecated Server must handle login, obviously EventMaker has access
+	 * to itself therefore authentication must happen outside of this class.
 	 */
 	public void log_in(String username, String password) throws Exception {
-		
 		//Exception if wrong password
 		//throw new Exception("Incorrect password");
 		
@@ -27,36 +40,82 @@ public class EventMaker {
 	
 	/**
 	 * User wants to create an event, we create the event object.
-	 * The data for this object is gotten via GUI. The entire parameterlist
-	 * is derived from the GUI.
+	 * The data for this object is gotten via GUI, the GUI calls the method.
+	 * When the Event is created it is added to this EventMakers personal list of Events
+	 * @parameter Event fields
 	 * @return the created Event object
 	 */
-	public Event createEvent(String tittel, String beskrivelse, String dato, 
-			int startHour, int startMin, int endHour, int endMin, 
-			String romSted, EventTypes type, EventMaker deltagere, 
-			Boolean lydVarsling, Boolean tekstVarsling) 
-	{	
+	public Event createEvent(String title, String description, Date startDate, 
+			Date endDate, Locale locale, EventTypes type, List<EventMaker> participants, 
+			Boolean lydVarsling, Boolean tekstVarsling) {
+		
 		Event event = new Event();
 		
-		//2. set data into event
+		event.setStartDate(startDate);
+		event.setEndDate(endDate);
+		event.setLocale(locale);
+		event.setDescription(description);
+		event.setTitle(title);
+		event.addListParticipants(participants);
+		event.setAdmin(this);
 		
-		return event; //TODO currently returns an empty event, see above!
+		return event;
 	}
 	
+	/**
+	 * This EventMaker has been invited to an event, add to list of invitations 
+	 * and fire event so that user sees this if already logged on.
+	 * @param event
+	 */
 	public void inviteToEvent(Event event) {
-		//FireEvent mayhaps?
+		//TODO PropertyChangeListener maybe?
+		invitations.add(event);
 	}
 	
-	public void notifyDeleteEvent(Event event) {
-		//Perhaps a fireEvent is in order here to harass the GUI into updating?
+	/**
+	 * This EventMaker is notified that an event has been deleted. Therefore
+	 * the event is deleted from his personal list 'events'.
+	 * 
+	 */
+	public boolean notifyDeleteEvent(Event event) {
+		//TODO user must be notified via prompt, either whilst logged on, or next time
+		//user logs on. This is where deletes list comes into play.
+		addDeleted(event);
+		return this.events.remove(event);
 	}
 	
 	public void saveEvent() {
 		
 	}
 	
-	public void deleteEvent() {
+	/**
+	 * 
+	 * @param The event to be deleted
+	 * @throws Exception if this eventmaker is not admin of event. Therefore cannot delete
+	 */
+	public void deleteEvent(Event event) throws Exception {
 		
+		if(this != event.getAdmin()) throw new Exception("Cannot delete, user is not administrator");
+		else if(events.contains(event))//user is admin and event is in his list
+		{
+			event.notifyDelete(); //tells everyone subscribing to event to delete it
+			//including this eventmaker
+		}
+	}
+	
+	/**
+	 * events that haven't been responded to yet (accept/decline)
+	 * TODO as soon as user has logged on, a check should be run on whether 
+	 * there are any invitations that haven't been responded to
+	 */
+	public List<Event> getInvitationList()
+	{
+		return invitations;
+	}
+	
+	public void addInvitation(Event event)
+	{
+		invitations.add(event);
 	}
 	
 	/**
@@ -74,6 +133,22 @@ public class EventMaker {
 	
 	public boolean[][] getCalendar() {
 		return calendar;
+	}
+
+	public List<String> getDeletes() {
+		return deletes;
+	}
+
+	public void addDeleted(Event event) {
+		deletes.add(event.toString());
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	
 }

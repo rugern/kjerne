@@ -7,13 +7,14 @@ import java.util.List;
 public class Event {
 	
 	private int ID;
-	private Date date;
-	private Time time;
-	private Locale locale;
+	private Date startDate; //Date also has hours and minutes, so we'll make startDate, endDate
+	private Date endDate; //these two contain all information needed for time
+	private Locale locale; //
 	private String description;
 	private String title;
 	private List<Employee> participants;
 	private Locales locales;
+	private EventMaker admin; //administrator of event
 	
 	public Event() {
 		locales = new Locales();	
@@ -25,14 +26,18 @@ public class Event {
 		return null; //TODO
 	}
 	
-	//Not final, but guessing call to employee-class to notify about event
+	/**
+	 * Invitation to event is sent to following list of employees
+	 */
 	public void eventInvitation() {
 		for(Employee e: participants) {
 			e.inviteToEvent(this);
 		}
 	}
 	
-	//Not final, but guessing call to employee-class to notify about event
+	/**
+	 * Notifies participants that the event has been deleted
+	 */
 	public void notifyDelete() {
 		for(Employee e: participants) {
 			e.notifyDeleteEvent(this);
@@ -57,9 +62,21 @@ public class Event {
 		return locales.getLocales(start, end);
 	}
 
-	//Add participants to event
+	/**
+	 * Add single participant to event
+	 * @param Employee participant
+	 */
 	public void addParticipants(Employee participant) {
 		participants.add(participant);
+	}
+	
+	/**
+	 * Add list of participants to event
+	 * @param List participants
+	 */
+	public void addListParticipants(List participants)
+	{
+		participants.addAll(participants);
 	}
 
 	//Only getters and setters from here and down
@@ -71,22 +88,23 @@ public class Event {
 		ID = iD;
 	}
 	
-	public Date getDate() {
-		return date;
+	public Date getStartDate() {
+		return startDate;
 	}
 	
-	public void setDate(Date date) {
-		this.date = date;
+	public void setStartDate(Date sDate) {
+		this.startDate = sDate;
 	}
 	
-	public Time getTime() {
-		return time;
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
 	}
 	
-	public void setTime(Time time) {
-		this.time = time;
-	}
-	
+		
 	public Locale getLocale() {
 		return locale;
 	}
@@ -118,4 +136,31 @@ public class Event {
 	public Locales getLocales() {
 		return locales;
 	}
+
+	public EventMaker getAdmin() {
+		return admin;
+	}
+
+	public void setAdmin(EventMaker admin) {
+		this.admin = admin;
+	}
+	
+	//We might need this if encapsulating all time into date doesn't pan out
+	/*	public Time getStartTime() {
+			return startTime;
+		}
+		
+		public Time getEndTime() {
+			return endTime;
+		}
+
+		public void setEndTime(Time eTime) {
+			this.endTime = eTime;
+		}
+
+		public void setStartTime(Time sTime) {
+			this.startTime = sTime;
+		}
+	*/
+
 }
