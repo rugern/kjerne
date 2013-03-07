@@ -1,6 +1,7 @@
 package datamodell;
 
 //Dette er en test fra Vikas
+//dette er en test fra øyvind
 
 public class Employee extends EventMaker {
 	
