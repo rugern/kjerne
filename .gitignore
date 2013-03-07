@@ -15,7 +15,10 @@ local.properties
 .classpath
 .settings/
 .loadpath
+<<<<<<< HEAD
 .DS_Store
+=======
+>>>>>>> commit
 
 # External tool builders
 .externalToolBuilders/
