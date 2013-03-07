@@ -103,7 +103,6 @@ public class Event {
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
-	
 		
 	public Locale getLocale() {
 		return locale;
