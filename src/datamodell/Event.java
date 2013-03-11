@@ -24,7 +24,6 @@ public class Event {
 	private EventMaker admin; //administrator (creator) of event
 	private Query query; //Handles database queries
 	
-	
 	//Constructor
 	public Event(EventMaker maker) {
 		admin = maker;
@@ -56,7 +55,7 @@ public class Event {
 	}
 	
 	//Reserve location in locales and set locale field here
-	public void reserveLocale(String locale, Time start, Time end) {
+	public void reserveLocale(String locale, int start, int end) {
 		locales.setReservedLocale(locale, start, end);
 		setLocale(locale);
 	}
@@ -69,7 +68,7 @@ public class Event {
 //	}
 
 	//Returns available locales' roomnumber (primary key for locale in database) in given timespan
-	public int[][] getAvailableLocales(Date start, Date end) {
+	public int[][] getAvailableLocales(int start, int end) {
 		return locales.getLocales(start, end);
 	}
 
