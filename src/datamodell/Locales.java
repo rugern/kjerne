@@ -1,6 +1,7 @@
 package datamodell;
 
 import java.sql.Time;
+import java.sql.Date;
 //import java.sql.Connection;
 //import java.sql.DriverManager;
 //import java.sql.ResultSet;
