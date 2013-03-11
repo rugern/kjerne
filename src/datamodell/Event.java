@@ -24,6 +24,8 @@ public class Event {
 	private EventMaker admin; //administrator (creator) of event
 	private Query query; //Handles database queries
 	
+	
+	//Constructor
 	public Event(EventMaker maker) {
 		admin = maker;
 		locales = query.getLocales();	
