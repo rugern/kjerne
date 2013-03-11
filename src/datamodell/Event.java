@@ -9,21 +9,23 @@ public class Event {
 	private int ID;
 	private Date startDate; //Date also has hours and minutes, so we'll make startDate, endDate
 	private Date endDate; //these two contain all information needed for time
-	private Locale locale; //
+	private Locale locale; //The locale chosen for this event
 	private String description;
 	private String title;
-	private List<Employee> participants;
-	private Locales locales;
-	private EventMaker admin; //administrator of event
+	private List<Employee> participants; //Holds all participants in event, for easy notification 
+	private Locales locales; //Maybe implement getLocales-method instead
+	private EventMaker admin; //administrator (creator) of event
+	private Query query; //Handles database queries
 	
-	public Event() {
-		locales = new Locales();	
+	public Event(EventMaker maker) {
+		admin = maker;
+		locales = query.getLocales();	
 	}
 	
-	//Need to get employees from database, implement later
+	//Fetch employees from database
 	public Employee[] getEmployeeList() { 
-		
-		return null; //TODO
+		Employee[] employeeList = query.getEmployees();
+		return employeeList;
 	}
 	
 	/**
@@ -50,15 +52,15 @@ public class Event {
 		setLocale(locale);
 	}
 
-	//Reserve a name as location (location is not a meeting room)
+	//Reserve a name as location (when location is not a meeting room)
 	public void reserveLocale(String name, Time start, Time end) {
 		Locale l = new Locale(name);
 		locales.setReservedLocale(l, start, end);
 		setLocale(l);
 	}
 
-	//Not final, this returns available locales as boolean table (1 is reserved, 0 is not)
-	public boolean[][] getAvailableLocales(Time start, Time end) {
+	//Returns available locales' roomnumber (primary key for locale in database) in given timespan
+	public int[] getAvailableLocales(Date start, Date end) {
 		return locales.getLocales(start, end);
 	}
 
@@ -136,6 +138,10 @@ public class Event {
 		return locales;
 	}
 
+	public void setLocales(Locales locales) {
+		this.locales = locales;
+	}
+	
 	public EventMaker getAdmin() {
 		return admin;
 	}

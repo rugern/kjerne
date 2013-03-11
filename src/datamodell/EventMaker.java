@@ -49,7 +49,7 @@ public abstract class EventMaker {
 			Date endDate, Locale locale, EventTypes type, List<EventMaker> participants, 
 			Boolean lydVarsling, Boolean tekstVarsling) {
 		
-		Event event = new Event();
+		Event event = new Event(this);
 		
 		event.setStartDate(startDate);
 		event.setEndDate(endDate);
@@ -57,7 +57,6 @@ public abstract class EventMaker {
 		event.setDescription(description);
 		event.setTitle(title);
 		event.addListParticipants(participants);
-		event.setAdmin(this);
 		
 		return event;
 	}
