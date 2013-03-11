@@ -4,6 +4,13 @@ import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * An instance of the event class is constructed when an employee creates an calendar event.
+ * It contains methods for setting and getting information about each event, and method calls
+ * to the locales class to get available locales for the eventmaker of this instance.
+ * @author Rugern
+ *
+ */
 public class Event {
 	
 	private int ID;
