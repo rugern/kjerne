@@ -2,6 +2,7 @@ package datamodell;
 
 //Dette er en test fra Vikas
 //dette er en test fra øyvind
+//Fuck dere a! Nils
 
 public class Employee extends EventMaker {
 	
