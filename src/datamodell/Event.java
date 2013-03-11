@@ -16,11 +16,11 @@ public class Event {
 	private int ID;
 	private Date startDate; //Date also has hours and minutes, so we'll make startDate, endDate
 	private Date endDate; //these two contain all information needed for time
-	private Locale locale; //The locale chosen for this event
+	private String locale; //The locale chosen for this event
 	private String description;
 	private String title;
 	private List<Employee> participants; //Holds all participants in event, for easy notification 
-	private Locales locales; //Maybe implement getLocales-method instead
+	private Locales locales; //Instance holds methods for getting locales list and reservation of locale
 	private EventMaker admin; //administrator (creator) of event
 	private Query query; //Handles database queries
 	
@@ -28,7 +28,7 @@ public class Event {
 	//Constructor
 	public Event(EventMaker maker) {
 		admin = maker;
-		locales = query.getLocales();	
+		locales = new Locales();	
 	}
 	
 	//Fetch employees from database
@@ -56,20 +56,20 @@ public class Event {
 	}
 	
 	//Reserve location in locales and set locale field here
-	public void reserveLocale(Locale locale, Time start, Time end) {
+	public void reserveLocale(String locale, Time start, Time end) {
 		locales.setReservedLocale(locale, start, end);
 		setLocale(locale);
 	}
 
 	//Reserve a name as location (when location is not a meeting room)
-	public void reserveLocale(String name, Time start, Time end) {
-		Locale l = new Locale(name);
-		locales.setReservedLocale(l, start, end);
-		setLocale(l);
-	}
+//	public void reserveLocale(String name, Time start, Time end) {
+//		Locale l = new Locale(name);
+//		locales.setReservedLocale(l, start, end);
+//		setLocale(l);
+//	}
 
 	//Returns available locales' roomnumber (primary key for locale in database) in given timespan
-	public int[] getAvailableLocales(Date start, Date end) {
+	public int[][] getAvailableLocales(Date start, Date end) {
 		return locales.getLocales(start, end);
 	}
 
@@ -115,11 +115,11 @@ public class Event {
 		this.endDate = endDate;
 	}
 		
-	public Locale getLocale() {
+	public String getLocale() {
 		return locale;
 	}
 	
-	public void setLocale(Locale locale) {
+	public void setLocale(String locale) {
 		this.locale = locale;
 	}
 	
@@ -141,14 +141,6 @@ public class Event {
 	
 	public List<Employee> getParticipants() {
 		return participants;
-	}
-	
-	public Locales getLocales() {
-		return locales;
-	}
-
-	public void setLocales(Locales locales) {
-		this.locales = locales;
 	}
 	
 	public EventMaker getAdmin() {
