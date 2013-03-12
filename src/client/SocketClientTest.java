@@ -6,7 +6,7 @@ public class SocketClientTest {
 
 	public static void main(String[] args)
 	{
-		SocketClient client = new SocketClient("localhost", 1337);
+		SocketClient client = new SocketClient("127.0.0.1", 1337);
 		try {
 			client.run();
 		} catch (IOException e) {
