@@ -1,13 +1,9 @@
 package testPackage;
 
-import static org.junit.Assert.assertEquals;
-
-import java.awt.List;
+import static org.junit.Assert.*;
 import java.util.ArrayList;
-
 import org.junit.Before;
 import org.junit.Test;
-
 import datamodell.Employee;
 import datamodell.Event;
 
@@ -93,7 +89,7 @@ public class EventMakerTest {
 	//Asserts that deleteEvent deletes the event correctly
 	@Test
 	public void deleteEventTest() {
-		AssertTrue("Event list not empty", emp1.getEvents().isEmpty());
+		assertTrue("Event list not empty", emp1.getEvents().isEmpty());
 	}
 	
 	
