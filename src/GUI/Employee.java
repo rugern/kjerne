@@ -1,3 +1,5 @@
+package GUI;
+
 public class Employee extends EventMaker {
 
 	public Employee(String email) {

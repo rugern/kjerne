@@ -1,3 +1,5 @@
+package database;
+
 import java.lang.ClassNotFoundException;
 import java.sql.Connection;
 import java.sql.ResultSet;
