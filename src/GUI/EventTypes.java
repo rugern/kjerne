@@ -2,6 +2,6 @@ package GUI;
 
 public enum EventTypes {
 
-	møte,avtale;
+	meeting,appointment;
 
 }
