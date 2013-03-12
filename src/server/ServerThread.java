@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 
+import datamodell.Employee;
+
 /**
  * There is one of of these threads for each user logged in, it holds the ID of the Owner logged in and handles all input and output.
  * 
@@ -20,7 +22,7 @@ public class ServerThread extends Thread
 	private int number;
 	private boolean stop = false;
 	private boolean loggedIn = false;
-	private Owner owner = null;
+	private Employee user = null; 
 	
 	public ServerThread(Socket socket, int threadNumber)  
 	{
@@ -143,11 +145,11 @@ public class ServerThread extends Thread
 	
 	public void setOwner(Owner o)
 	{
-		owner = o;
+		user = o;
 	}
 	public Owner getOwner()
 	{
-		return owner;
+		return user;
 	}
 	
 	

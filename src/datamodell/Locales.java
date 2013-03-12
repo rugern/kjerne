@@ -1,5 +1,6 @@
 package datamodell;
 
+import GUI.*;
 import java.sql.Time;
 import java.sql.Date;
 //import java.sql.Connection;

@@ -38,6 +38,7 @@ public class SocketClient {
 			out.flush();
 			in = new ObjectInputStream(clientSocket.getInputStream());
 			
+			//setup listener so that server can send updates to client
 			socketClientListener = new SocketClientListener(in);
 			socketClientListener.start();
 
@@ -53,7 +54,7 @@ public class SocketClient {
 	 * @param o The object to be sent
 	 * @author halvor
 	 */
-	public void sendMessage(CommMessage<?> o)
+	public void sendMessage(UpdateCalendarMessage<?> o)
 	{
 		try
 		{
@@ -66,8 +67,7 @@ public class SocketClient {
 			e.printStackTrace();
 		}
 
-		// socketClientListener lytter til alle beskjeder sendt tilbake til client. Sp�r sCL om siste mottatte beskjed.
-		ClientUnpacker.unpackClientMessage(socketClientListener.getLatestMessage());
+		//ClientUnpacker.unpackClientMessage(socketClientListener.getLatestMessage());
 
 	}
 
