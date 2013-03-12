@@ -1,8 +1,9 @@
 package datamodell;
 
-import java.sql.Time;
 import java.util.Date;
 import java.util.List;
+
+import database.Query;
 
 /**
  * An instance of the event class is constructed when an employee creates an calendar event.
@@ -68,7 +69,7 @@ public class Event {
 //	}
 
 	//Returns available locales' roomnumber (primary key for locale in database) in given timespan
-	public int[][] getAvailableLocales(int start, int end) {
+	public int[][] getAvailableLocales(Date start, Date end) {
 		return locales.getLocales(start, end);
 	}
 
