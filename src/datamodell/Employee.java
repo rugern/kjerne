@@ -11,5 +11,8 @@ public class Employee extends EventMaker {
 
 	private int ssn;
 	
-	
+	public int getID()
+	{
+		return ssn;
+	}
 }

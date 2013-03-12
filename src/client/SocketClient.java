@@ -1,5 +1,13 @@
 package client;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import server.CommPack;
+
 /**
  * SocketClient creates a connection for the client to the server
  * The SocketClient object must be constructed with a valid server name)
@@ -54,7 +62,7 @@ public class SocketClient {
 	 * @param o The object to be sent
 	 * @author halvor
 	 */
-	public void sendMessage(UpdateCalendarMessage<?> o)
+	public void sendMessage(CommPack o)
 	{
 		try
 		{
