@@ -38,7 +38,8 @@ public class EventMakerTest {
 		event.setLocale(locale);
 		event.setDescription(description);
 		event.setTitle(title);
-		event.addListParticipants(participants);
+		event.addParticipants(emp2);
+		event.addParticipants(emp3);
 	}
 	
 	//Throws exception if wrong password or username, test fails if not
@@ -56,6 +57,8 @@ public class EventMakerTest {
 		assertEquals("locale not equal", event.getLocale(), event2.getLocale());
 		assertEquals("description not equal", event.getDescription(), event2.getDescription());
 		assertEquals("title not equal", event.getTitle(), event2.getTitle());
+		assertEquals("participants not equal", event.getParticipants(), event2.getParticipants());
+		
 		
 	}
 		
