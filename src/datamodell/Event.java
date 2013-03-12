@@ -61,12 +61,14 @@ public class Event {
 		setLocale(locale);
 	}
 
+	//Not yet decided if we need this:
 	//Reserve a name as location (when location is not a meeting room)
-//	public void reserveLocale(String name, Time start, Time end) {
-//		Locale l = new Locale(name);
-//		locales.setReservedLocale(l, start, end);
-//		setLocale(l);
-//	}
+/*	public void reserveLocale(String name, Time start, Time end) {
+		Locale l = new Locale(name);
+		locales.setReservedLocale(l, start, end);
+		setLocale(l);
+	}
+*/
 
 	//Returns available locales' roomnumber (primary key for locale in database) in given timespan
 	public int[][] getAvailableLocales(Date start, Date end) {
