@@ -54,15 +54,16 @@ public class ServerThread extends Thread
 		{
 			
 	        try {
-				CommMessage<?> message = (CommMessage<?>) in.readObject();
+				CommPack message = (CommPack) in.readObject();
 				
-				CommMessage<?> reply = ServerUnpacker.unpackServerMessage(message, this);
+				CommPack reply;
+				//reply = ServerUnpacker.unpackServerMessage(message, this);
 				
-				if (reply != null)
+				/*if (reply != null)
 				{
 					sendMessage(reply);
 					System.out.println("Server thread #" + number + " sent reply to msg: " + message.getMessageName());
-				}
+				}*/ //TODO set up reply system, priority #3
 				//
 				//System.out.println(message.getMessageName());
 				//sendMessage(message);
@@ -96,7 +97,7 @@ public class ServerThread extends Thread
 	 * 
 	 * @author halvor
 	 */
-	public synchronized void sendMessage(CommMessage<?> msg)
+	public synchronized void sendMessage(CommPack msg)
 	{
 		try
 		{
@@ -122,12 +123,12 @@ public class ServerThread extends Thread
 	 */
 	public void close()
 	{
-		if (getOwner() != null)
+		/*if (getUser() != null)
 		{
 			int clientIndex = Server.loggedInClients.indexOf(getOwner().getOwnerId());
 			if (clientIndex != -1)
 				Server.loggedInClients.remove(clientIndex);
-		}
+		}*/ //TODO introduce list of users logged in.
 		out = null;
 		in = null;
 		connection = null;
@@ -143,11 +144,12 @@ public class ServerThread extends Thread
 		return this.loggedIn;
 	}
 	
-	public void setOwner(Owner o)
+	public void setUser(Employee e)
 	{
-		user = o;
+		user = e;
 	}
-	public Owner getOwner()
+	
+	public Employee getUser()
 	{
 		return user;
 	}

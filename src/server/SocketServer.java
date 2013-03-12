@@ -1,7 +1,5 @@
 package server;
 
-import helpclasses.CommMessage;
-
 import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
@@ -59,8 +57,6 @@ public class SocketServer {
 			e.printStackTrace();
 		}
 	}
-	
-	
 
 	public void close()
 	{
@@ -78,11 +74,11 @@ public class SocketServer {
 		}
 	}
 	
-	public ServerThread getThread(int ownerID)
+	public ServerThread getThread(int userID)
 	{
 		for (ServerThread st: threads)
 		{
-			if (st.getOwner().getOwnerId() == ownerID)
+			if (st.getUser().getID() == userID)
 			{
 				return st;
 			}
