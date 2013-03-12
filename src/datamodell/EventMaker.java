@@ -151,4 +151,8 @@ public abstract class EventMaker {
 		this.email = email;
 	}
 	
+	public List<Event> getEvents() {
+		return events;
+	}
+	
 }
