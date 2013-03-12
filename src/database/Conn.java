@@ -31,7 +31,9 @@ public class Conn {
 
 			statement = connection.createStatement();
 
+			query.addEvent(connection, "test", "testing@gmail.com", null, null, null, "hydro", null, (Integer) null);
 			System.out.println("entered");
+			
 			
 			query.getEventByDate(connection, "@gmail.com", "2013mar01");
 			
