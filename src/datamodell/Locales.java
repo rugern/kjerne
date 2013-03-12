@@ -3,90 +3,57 @@ package datamodell;
 import GUI.*;
 import java.sql.Time;
 import java.util.Date;
-//import java.sql.Connection;
-//import java.sql.DriverManager;
-//import java.sql.ResultSet;
-//import java.sql.ResultSetMetaData;
-//import java.sql.SQLException;
-//import java.sql.Statement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 
 public class Locales {
-	
-//	private static String url = "jdbc:mysql://mysql.stud.ntnu.no:3306/nilsiru_felles"; //address of mySQL server
-//	private static String user = "nilsiru_gruppe11@cura.itea.ntnu.no"; //Effective username at server
-//	private static String pw = "felles"; //Password
-//	private static String sql = "SELECT Roomnr, Capacity, StartTime, EndTime FROM Locale AS L INNER JOIN Event AS E ON (L.Roomnr=E.Roomnr)"; //returns all rooms in use in a event, and the start time and end time for that event
-//	private static ResultSet result; //Saves the result from query
-//	private static ResultSetMetaData metadata; //Saves info about result
+//	private static String sql = "SELECT Roomnr, StartTime, EndTime FROM Locale AS L INNER JOIN Event AS E ON (L.Roomnr=E.Roomnr)"; //returns all rooms in use in a event, and the start time and end time for that event
 	
 	@SuppressWarnings("null")
-	public int[][] getLocales(Date start, Date end) {
-//		Connection connection = null;
-//		Statement statement = null;
-		int[][] Rooms = null;
-		int[][] availableRooms = null;
+	public int[] getLocales(String startTime, String endTime) { // får jeg dette som string???
+		ResultSet result;
+		double[][] Rooms = null;
+		int[] availableRooms = null;
+		double start;
+		double end;
 		
 		
-		Rooms = getRoomsAndDate(); //returns roomnr(int) in first column, size of room in second(int), start time(DateTime) for the event where the room is in use, and in the forth, it returns the end time(DateTime)
+		result = getRoomsAndDate(); //returns the result after an sql query for all rooms(int) in use in a event and the connected start time(String)(tt:mm), end time(String)(tt:mm), start date (String)(dd/mm/YYYY) and end date(String)(dd/mm/YYYY) for these.
 		
 		int i=0;
+		
+		while (result.next()) {
+			Rooms[i][0]=result.getInt(1);
+			Rooms[i][1]=StringsToDouble(result.getString(3),result.getString(1)); //saves the start time as an double on the form YYYYMMDDhhmm
+			Rooms[i][2]=StringsToDouble(result.getString(4),result.getString(2)); //saves the end time as an double on the form YYYYMMDDhhmm
+			
+			i++;
+		}
+		
+		i=0;
 		int j=0;
 		
 		while (i < Rooms.length) {
-			if (Rooms[i][2].isAfter(end)) {
-				availableRooms[j][0] = Rooms[i][0];
-				availableRooms[j][1] = Rooms[i][1];
+			if (Rooms[i][1]>end) {
+				availableRooms[j] = (int) Rooms[i][0];
 				j++;
-			} else if (start.isAfter(Rooms[i][3])) {
-				availableRooms[j][0] = Rooms[i][0];
-				availableRooms[j][1] = Rooms[i][1];
+			} else if (start>Rooms[i][2]) {
+				availableRooms[j] = (int) Rooms[i][0];
 				j++;
 			}
 			i++;
 		}
-		/**try {
-			Class.forName("com.mysql.jdbc.Driver");
-			connection = DriverManager.getConnection(url, user, pw);
-			statement = connection.createStatement();
-			
-			result = statement.executeQuery(sql);
-			
-			int i = 1;
-			
-			try {
-				while (result.next()) {
-					Rooms[i-1][1] = result.getInt(1);
-					Rooms[i-1][2] = result.getInt(2);
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			
-		} catch (ClassNotFoundException event){
-			event.printStackTrace();
-			System.out.println("Could not connect");
-		} catch (SQLException event) {
-			event.printStackTrace();
-			System.out.println("Could not connect");
-		}finally {
-			if(connection != null) {
-				try {
-					connection.close();
-				} catch (SQLException event) {
-					event.printStackTrace();
-					System.out.println("Connection failed to close");
-				}
-			}if(statement != null) {
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-					System.out.println("Statement failed to close");
-				}
-			}
-		}*/
-		
 		return availableRooms;
+	}
+	
+	public double StringsToDouble(String date, String time) {
+		String strDate = date.substring(6, 10);
+		strDate += date.substring(3, 5);
+		strDate += date.substring(0, 2);
+		strDate += time.substring(0, 2);
+		strDate += time.substring(3, 5);
+		double doubleDate = Double.parseDouble(strDate);
+		
+		return doubleDate;
 	}
 }
