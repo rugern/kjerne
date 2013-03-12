@@ -1,8 +1,9 @@
 package testPackage;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.awt.List;
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,20 +20,21 @@ public class EventMakerTest {
 	private String locale = "Samfundet";
 	private String description = "Skal drikke øl";
 	private String title = "Fest";
-	private List participants;
+	private ArrayList<Employee> participants;
 	
-	
+	//Initialize necessary testing instances
 	@Before
 	public void init() {
+		//Creates employees and adds emp2 and emp3 to a list
 		emp1 = new Employee("olav@firmax.com");
 		emp2 = new Employee("hans@firmax.com");
 		emp3 = new Employee("per@firmax.com");
-		List<Employee> participants = new List();
+		participants = new ArrayList();
 		participants.add(emp2);
 		participants.add(emp3);
 		
+		//Create event, with emp1 as admin
 		event = new Event(emp1);
-		event.addParticipants(participants);
 		event.setStartDate(startDate);
 		event.setEndDate(endDate);
 		event.setLocale(locale);
@@ -40,9 +42,10 @@ public class EventMakerTest {
 		event.setTitle(title);
 		event.addParticipants(emp2);
 		event.addParticipants(emp3);
+		
 	}
 	
-	//Throws exception if wrong password or username, test fails if not
+	//Method throws exception if wrong password or username, test fails if it doesn't
 	@Test(expected = Exception.class) 
 	public void loginTest() throws Exception {
 		emp.log_in("olav", "qwerty");
@@ -57,11 +60,41 @@ public class EventMakerTest {
 		assertEquals("locale not equal", event.getLocale(), event2.getLocale());
 		assertEquals("description not equal", event.getDescription(), event2.getDescription());
 		assertEquals("title not equal", event.getTitle(), event2.getTitle());
-		assertEquals("participants not equal", event.getParticipants(), event2.getParticipants());
-		
-		
+		assertEquals("participants not equal", event.getParticipants(), event2.getParticipants());	
+		assertEquals("email not equal", "olav@firmax.com", event.getAdmin().getEmail());
 	}
-		
+	
+	//Asserts that invitations is received by all participants
+	@Test
+	public void participantInvitationTest() {
+		event.eventInvitation();
+		assertTrue("Participants have not been invited", assertEmployeesInvited(emp2.getInvitationList(), emp3.getInvitationList()));
+	}
+	
+	//Returns true if participants have the invitation in their list
+	private boolean assertEmployeesInvited(ArrayList<Event> list2, ArrayList<Event> list3) {
+		if(list2.isEmpty() || list3.isEmpty()) {
+			return false;
+		}
+		if(list2.get(0)==event && list3.get(0)==event) {
+			return true;
+		}
+		return false;
+	}
+	
+	//Asserts that employee is admin of event
+	@Test
+	public void employeeIsAdminTest() {
+		assertEquals("Employee is not admin", emp1, event.getAdmin());
+		event.setAdmin(emp2); //Now emp2 is admin of event
+		assertEquals("New employee is not admin", emp2, event.getAdmin());
+	}
+	
+	//Asserts that deleteEvent deletes the event correctly
+	@Test
+	public void deleteEventTest() {
+		AssertTrue("Event list not empty", emp1.getEvents().isEmpty());
+	}
 	
 	
 
