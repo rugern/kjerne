@@ -57,7 +57,9 @@ public class Locales {
 	}
 	
 	//Sets locale as reserved from start time to end time
-	public void setReservedLocale(String locale, int start, int end) {
-		//TODO
+	public void setReservedLocale(String locale, String start, String end) {
+		//TODO, needed for event class
+		long startDate = Long.parseLong(start);
+		long endDate = Long.parseLong(end);
 	}
 }

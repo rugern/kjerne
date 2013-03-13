@@ -46,19 +46,11 @@ public abstract class EventMaker {
 	 * @parameter Event fields
 	 * @return the created Event object
 	 */
-	public Event createEvent(String title, String description, Date startDate, 
-			Date endDate, Locale locale, EventTypes type, List<EventMaker> participants, 
+	public Event createEvent(String title, String description, String startDate, 
+			String endDate, String locale, EventTypes type, List<EventMaker> participants, 
 			Boolean lydVarsling, Boolean tekstVarsling) {
 		
-		Event event = new Event(this);
-		
-		event.setStartDate(startDate);
-		event.setEndDate(endDate);
-		event.setLocale(locale);
-		event.setDescription(description);
-		event.setTitle(title);
-		event.addListParticipants(participants);
-		
+		Event event = new Event(this, startDate, endDate, locale, description, title, participants, type);
 		return event;
 	}
 	
