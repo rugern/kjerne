@@ -120,21 +120,21 @@ public class Query {
 		int weekNumber = dtsm.getWeeksNumber(dtsm.getCompleteDate(date, year));
 
 		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
-				.prepareStatement("SELECT Title, Email, StartDate, Place FROM event WHERE weekNR=? AND Email =? ");
+				.prepareStatement("SELECT Title, Email, StartDate, Place, EventID FROM event WHERE weekNR=? AND Email =? ");
 
 		preparedStatement.setInt(1, weekNumber);
 		preparedStatement.setString(2, email);
 
-		resultSet = preparedStatement.executeQuery();
+		ResultSet resultSet = preparedStatement.executeQuery();
 
 		ArrayList<Event> weekEventList = new ArrayList<Event>();
 		ArrayList<EventMaker> employeeList = new ArrayList<EventMaker>();
 
+		System.out.println("hit");
+		
 		while (resultSet.next()) {
 
 			String sDate = resultSet.getString("StartDate");
-			
-			MainProfileGUI mpg = new MainProfileGUI();
 
 			String title = resultSet.getString("Title");
 			String ownerMail = resultSet.getString("Email");
@@ -142,12 +142,13 @@ public class Query {
 
 			EventMaker eventMaker = new Employee(email);
 
-//			Event testEvent = new Event(eventID, eventMaker.getEmail(), sDate,
-//					"2013/06/06", "locale", "Dette er en test", employeeList,
-//					EventTypes.appointment);
-
 			Event testEvent = new Event(eventID, email, sDate, "2013/12/12", "place", "test","Mitt møte",employeeList, EventTypes.appointment);
+			
+			System.out.println(testEvent.getClass());
+			
 			weekEventList.add(testEvent);
+			
+			System.out.println(weekEventList.size());
 		}
 
 		return weekEventList;

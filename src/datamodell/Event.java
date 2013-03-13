@@ -9,6 +9,8 @@ import GUI.EventTypes;
  * An instance of the event class is constructed when an employee creates an calendar event.
  * It contains methods for setting and getting information about each event, and method calls
  * to the locales class to get available locales for the eventmaker of this instance.
+ * 
+ * @TODO We need to implement methods of communication between client socket and this class
  * @author Rugern
  *
  */

@@ -123,7 +123,7 @@ public class MainProfileGUI extends JPanel {
 		
 		receivedRequestList = new JList(testModel);
 		receivedRequestList.setFixedCellHeight(30);
-		receivedRequestList.setCellRenderer(new EventRenderer());
+//		receivedRequestList.setCellRenderer(new EventRenderer());
 		receivedRequestList.addMouseListener(new EventInfo());
 		
 		JScrollPane receivedRequestScrollPane = new JScrollPane(
@@ -144,7 +144,7 @@ public class MainProfileGUI extends JPanel {
 		
 		sentRequestList = new JList(testModel);
 		sentRequestList.setFixedCellHeight(30);
-		sentRequestList.setCellRenderer(new EventRenderer());
+//		sentRequestList.setCellRenderer(new EventRenderer());
 		sentRequestList.addMouseListener(new EventInfo());
 		
 		JScrollPane sentRequestScrollPane = new JScrollPane(sentRequestList);
@@ -196,7 +196,13 @@ public class MainProfileGUI extends JPanel {
 		try {
 			ArrayList<Event> weekEvents = new Query().getThisWeeksEvents("@gmail.com", cal.getDate(), cal.getDate().getYear());
 			weekModel = new DefaultListModel();
-			weekModel.addElement(weekEventsList);
+			
+			
+			for (int i = 0; i < weekEvents.size(); i++) {
+			weekModel.addElement(weekEvents);
+			}	
+			System.out.println("size etter opprettelse " + weekModel.size());
+			
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -211,6 +217,8 @@ public class MainProfileGUI extends JPanel {
 		weekEventsList.setFixedCellWidth(280);
 		weekEventsList.setFixedCellHeight(30);
 		weekEventsList.addMouseListener(new EventInfo());
+		
+		System.out.println(weekEventsList.size());
 		
 		JScrollPane weekEventScrollPane = new JScrollPane(weekEventsList);
 		weekEventScrollPane.setBorder(null);
@@ -249,7 +257,7 @@ public class MainProfileGUI extends JPanel {
 		chosenDayEventList = new JList(testModel);
 		chosenDayEventList.setFixedCellHeight(30);
 		chosenDayEventList.addMouseListener(new EventInfo());
-		chosenDayEventList.setCellRenderer(new EventRenderer());
+//		chosenDayEventList.setCellRenderer(new EventRenderer());
 		
 		JScrollPane chosenDayEventScrollPane = new JScrollPane(
 				chosenDayEventList);
@@ -439,8 +447,7 @@ public class MainProfileGUI extends JPanel {
 
 		public void infoViewer() {
 
-			JOptionPane.showMessageDialog(null, "INFORMASJON OM " + tOBJ.string + "  " + tOBJ.value);
-
+			JOptionPane.showMessageDialog(null, "INFORMASJON OM event");
 		}
 
 		public void answerRequestViewer() {
@@ -498,7 +505,14 @@ public class MainProfileGUI extends JPanel {
 		public Component getListCellRendererComponent(JList arg0, Object arg1,
 				int arg2, boolean isSelected, boolean arg4) {
 
-			setText("Tittel   Beskrivelse    Tid    Dato");
+			Event e = (Event) arg1;
+			
+			if(arg1 == null){
+				System.out.println("null");
+			}
+
+			
+			setText(e.getAdminEmail());
 
 			if (isSelected) {
 				setForeground(Color.RED);
