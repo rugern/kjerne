@@ -29,7 +29,6 @@ public class Event {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.locale = locale;
-		reserveLocale(locale, startDate, endDate);
 		this.description = description;
 		this.title = title;
 		this.participants = participants;
@@ -54,12 +53,6 @@ public class Event {
 		}
 	}
 	
-	//Reserve location in locales and set locale field here
-	public void reserveLocale(String locale, String start, String end) {
-		locales.setReservedLocale(locale, start, end);
-		setLocale(locale);
-	}
-	
 	/**
 	 * Add single participant to event
 	 * @param Employee participant
@@ -78,11 +71,17 @@ public class Event {
 	}
 	
 	/**
-	 * The methods commented out under is probably not needed (depending on final GUI)
+	 * The methods commented out may not be necessary depending on final GUI, as methods can be called directly from GUI
+	 * to the relevant class
 	 */
+	/*
+	//Reserve location in locales and set locale field here
+	public void reserveLocale(String locale, String start, String end) {
+		locales.setReservedLocale(locale, start, end);
+		setLocale(locale);
+	}
 	
 	//Fetch employees from database
-	/*
 	public Employee[] getEmployeeList() { 
 		Employee[] employeeList = query.getEmployees();
 		return employeeList;
@@ -94,10 +93,8 @@ public class Event {
 	locales.setReservedLocale(l, start, end);
 	setLocale(l);
 	}
-	 */
 
 	//Returns available locales' roomnumber (primary key for locale in database) in given timespan
-	/*
 	public int[][] getAvailableLocales(Date start, Date end) {
 		return locales.getLocales(start, end);
 	}
@@ -171,23 +168,4 @@ public class Event {
 	public void setEventTypes(EventTypes eventTypes) {
 		this.eventTypes = eventTypes;
 	}
-	
-	//We might need this if encapsulating all time into date doesn't pan out
-	/*	public Time getStartTime() {
-			return startTime;
-		}
-		
-		public Time getEndTime() {
-			return endTime;
-		}
-
-		public void setEndTime(Time eTime) {
-			this.endTime = eTime;
-		}
-
-		public void setStartTime(Time sTime) {
-			this.startTime = sTime;
-		}
-	*/
-
 }
