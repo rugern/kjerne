@@ -197,11 +197,9 @@ public class MainProfileGUI extends JPanel {
 			ArrayList<Event> weekEvents = new Query().getThisWeeksEvents("@gmail.com", cal.getDate(), cal.getDate().getYear());
 			weekModel = new DefaultListModel();
 			
-			
 			for (int i = 0; i < weekEvents.size(); i++) {
-			weekModel.addElement(weekEvents);
+			weekModel.addElement(weekEvents.get(i));
 			}	
-			System.out.println("size etter opprettelse " + weekModel.size());
 			
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
@@ -210,15 +208,12 @@ public class MainProfileGUI extends JPanel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		
 		weekEventsList = new JList(weekModel);
 		weekEventsList.setCellRenderer(new EventRenderer());
 		weekEventsList.setFixedCellWidth(280);
 		weekEventsList.setFixedCellHeight(30);
 		weekEventsList.addMouseListener(new EventInfo());
-		
-		System.out.println(weekEventsList.size());
 		
 		JScrollPane weekEventScrollPane = new JScrollPane(weekEventsList);
 		weekEventScrollPane.setBorder(null);
@@ -430,11 +425,11 @@ public class MainProfileGUI extends JPanel {
 	//MouseListeners
 	public class EventInfo implements MouseListener {
 
-		TestingObject tOBJ = new TestingObject();
+		Event event;
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			tOBJ = (TestingObject) ((JList) e.getSource()).getSelectedValue();
+			event = (Event) ((JList) e.getSource()).getSelectedValue();
 			if (e.getClickCount() == 2) {
 				if (e.getSource() == chosenDayEventList
 						|| e.getSource() == weekEventsList || e.getSource() == sentRequestList) {
@@ -504,15 +499,10 @@ public class MainProfileGUI extends JPanel {
 		@Override
 		public Component getListCellRendererComponent(JList arg0, Object arg1,
 				int arg2, boolean isSelected, boolean arg4) {
-
+			
 			Event e = (Event) arg1;
 			
-			if(arg1 == null){
-				System.out.println("null");
-			}
-
-			
-			setText(e.getAdminEmail());
+			setText("Title: " + e.getTitle() + " : " + e.getDescription() + " Dato: " + e.getStartDate());
 
 			if (isSelected) {
 				setForeground(Color.RED);

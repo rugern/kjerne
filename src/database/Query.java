@@ -44,7 +44,7 @@ public class Query {
 
 	}
 
-	public void getRoomsAndDate() throws SQLException {
+	public ResultSet getRoomsAndDate() throws SQLException {
 
 		String sql = "SELECT Roomnr, StartTime, EndTime FROM Locale AS L INNER JOIN Event AS E ON (L.Roomnr=E.Roomnr)";
 
@@ -53,6 +53,7 @@ public class Query {
 
 		ResultSet resultSet = preparedStatement.executeQuery();
 
+		return resultSet;
 	}
 
 	public void addEvent(String title, String email, String startTime,
@@ -130,25 +131,17 @@ public class Query {
 		ArrayList<Event> weekEventList = new ArrayList<Event>();
 		ArrayList<EventMaker> employeeList = new ArrayList<EventMaker>();
 
-		System.out.println("hit");
-		
 		while (resultSet.next()) {
 
 			String sDate = resultSet.getString("StartDate");
-
 			String title = resultSet.getString("Title");
 			String ownerMail = resultSet.getString("Email");
 			int eventID = resultSet.getInt("EventID");
 
-			EventMaker eventMaker = new Employee(email);
+			weekEventList.add(new Event(eventID, email, sDate, "2013/12/12",
+					"place", "test", "Mitt møte", employeeList,
+					EventTypes.appointment));
 
-			Event testEvent = new Event(eventID, email, sDate, "2013/12/12", "place", "test","Mitt møte",employeeList, EventTypes.appointment);
-			
-			System.out.println(testEvent.getClass());
-			
-			weekEventList.add(testEvent);
-			
-			System.out.println(weekEventList.size());
 		}
 
 		return weekEventList;

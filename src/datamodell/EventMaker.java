@@ -24,7 +24,7 @@ public abstract class EventMaker {
 	private List<Event> events; //list of events this user is connected to
 	private List<Event> invitations; //TODO ensure accept and decline is handled
 	private List<String> deletes; //A quick toString of an event right before deletion ensures that the user knows what has been deleted, once user is notified, delete the string from this list as well.
-	private SocketClient socket = new SocketClient(server, port); //TODO
+//	private SocketClient socket = new SocketClient(server, port); //TODO
 	
 	public EventMaker(String email) {
 		this.setEmail(email);
@@ -49,11 +49,11 @@ public abstract class EventMaker {
 	 * @parameter Event fields
 	 * @return the created Event object
 	 */
-	public Event createEvent(String title, String description, String startDate, 
+	public Event createEvent(int ID, String title, String description, String startDate, 
 			String endDate, String locale, EventTypes type, ArrayList<EventMaker> participants, 
 			Boolean lydVarsling, Boolean tekstVarsling) {
 		
-		Event event = new Event(email, startDate, endDate, locale, description, title, participants, type);
+		Event event = new Event(0, email, startDate, endDate, locale, description, title, participants, type);
 		return event;
 	}
 	
@@ -84,14 +84,14 @@ public abstract class EventMaker {
 	}
 	
 	//Change event in this.events and database
-	public void changeEvent(Event event) {
-		if(email != event.getAdminEmail()) throw new Exception("Cannot change, user is not administrator");
-		else if(events.contains(event))//user is admin and event is in his list
-		{
-			event.eventInvitation(); //Gives invitation to changed event
-			socket.changeEventQuery(event); //Change event in database
-		}
-	}
+//	public void changeEvent(Event event) {
+//		if(email != event.getAdminEmail()) throw new Exception("Cannot change, user is not administrator");
+//		else if(events.contains(event))//user is admin and event is in his list
+//		{
+//			event.eventInvitation(); //Gives invitation to changed event
+//			socket.changeEventQuery(event); //Change event in database
+//		}
+//	}
 	
 	/**
 	 * 
@@ -104,21 +104,21 @@ public abstract class EventMaker {
 		else if(events.contains(event))//user is admin and event is in his list
 		{
 			event.notifyDelete(); //tells everyone subscribing to event to delete it
-			socket.deleteEventQuery(event.getID()); //Delete event from database
+//			socket.deleteEventQuery(event.getID()); //Delete event from database
 		}
 	}
 	
 	//Get this.calendar or coworkers calendar, specified by EventMaker's email
-	public ArrayList<Event> getDataBaseCalendar(String email) {
-		ArrayList<Event> calendar = socket.getCalendarQuery(email); //Returns coworker calendar from database
-		return calendar;
-	}
+//	public ArrayList<Event> getDataBaseCalendar(String email) {
+//		ArrayList<Event> calendar = socket.getCalendarQuery(email); //Returns coworker calendar from database
+//		return calendar;
+//	}
 	
 	//Get calendar for given week
-	public ArrayList<Event> getWeekCalendar(int weekNr) {
-		ArrayList<Event> weekList = socket.getWeekCalendarQuery(email, weekNr);
-		return weekList;
-	}
+//	public ArrayList<Event> getWeekCalendar(int weekNr) {
+//		ArrayList<Event> weekList = socket.getWeekCalendarQuery(email, weekNr);
+//		return weekList;
+//	}
 	
 	
 	/**
