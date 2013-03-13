@@ -17,7 +17,6 @@ public class Locales {
 		double start;
 		double end;
 		
-		
 		result = getRoomsAndDate(); //returns the result after an sql query for all rooms(int) in use in a event and the connected start time(String)(tt:mm), end time(String)(tt:mm), start date (String)(dd/mm/YYYY) and end date(String)(dd/mm/YYYY) for these.
 		
 		int i=0;
@@ -55,5 +54,10 @@ public class Locales {
 		double doubleDate = Double.parseDouble(strDate);
 		
 		return doubleDate;
+	}
+	
+	//Sets locale as reserved from start time to end time
+	public void setReservedLocale(String locale, int start, int end) {
+		//TODO
 	}
 }

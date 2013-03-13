@@ -15,8 +15,8 @@ import database.Query;
 public class Event {
 	
 	private int ID;
-	private Date startDate; //Date also has hours and minutes, so we'll make startDate, endDate
-	private Date endDate; //these two contain all information needed for time
+	private String startDate; //Date also has hours and minutes, so we'll make startDate, endDate
+	private String endDate; //these two contain all information needed for time
 	private String locale; //The locale chosen for this event
 	private String description;
 	private String title;
@@ -27,7 +27,7 @@ public class Event {
 	private EventTypes eventTypes;
 	
 	//Constructor
-	public Event(EventMaker maker, Date startDate, Date endDate, String locale, String description, String title, List<Employee> participant,
+	public Event(EventMaker maker, String startDate, String endDate, String locale, String description, String title, List<Employee> participant,
 			EventTypes eventTypes) {
 		admin = maker;
 		this.startDate = startDate;
@@ -113,19 +113,19 @@ public class Event {
 		ID = iD;
 	}
 	
-	public Date getStartDate() {
+	public String getStartDate() {
 		return startDate;
 	}
 	
-	public void setStartDate(Date sDate) {
+	public void setStartDate(String sDate) {
 		this.startDate = sDate;
 	}
 	
-	public Date getEndDate() {
+	public String getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(Date endDate) {
+	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
 		
