@@ -2,7 +2,7 @@ package datamodell;
 
 import java.util.Date;
 import java.util.List;
-
+import GUI.EventTypes;
 import database.Query;
 
 /**
@@ -24,18 +24,28 @@ public class Event {
 	private Locales locales; //Instance holds methods for getting locales list and reservation of locale
 	private EventMaker admin; //administrator (creator) of event
 	private Query query; //Handles database queries
+	private EventTypes eventTypes;
 	
 	//Constructor
-	public Event(EventMaker maker) {
+	public Event(EventMaker maker, Date startDate, Date endDate, String locale, String description, String title, List<Employee> participant,
+			EventTypes eventTypes) {
 		admin = maker;
-		locales = new Locales();	
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.locale = locale;
+		this.description = description;
+		this.title = title;
+		this.participants = participants;
+		this.eventTypes = eventTypes;
 	}
 	
 	//Fetch employees from database
+	/*
 	public Employee[] getEmployeeList() { 
 		Employee[] employeeList = query.getEmployees();
 		return employeeList;
 	}
+	*/
 	
 	/**
 	 * Invitation to event is sent to following list of employees
@@ -71,9 +81,11 @@ public class Event {
 */
 
 	//Returns available locales' roomnumber (primary key for locale in database) in given timespan
+	/*
 	public int[][] getAvailableLocales(Date start, Date end) {
 		return locales.getLocales(start, end);
 	}
+	*/
 
 	/**
 	 * Add single participant to event
