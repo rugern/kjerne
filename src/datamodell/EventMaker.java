@@ -2,7 +2,6 @@ package datamodell;
 
 import GUI.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,7 +46,7 @@ public abstract class EventMaker {
 	 * @return the created Event object
 	 */
 	public Event createEvent(String title, String description, String startDate, 
-			String endDate, String locale, EventTypes type, List<EventMaker> participants, 
+			String endDate, String locale, EventTypes type, ArrayList<EventMaker> participants, 
 			Boolean lydVarsling, Boolean tekstVarsling) {
 		
 		Event event = new Event(this, startDate, endDate, locale, description, title, participants, type);

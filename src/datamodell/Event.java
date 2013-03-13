@@ -1,6 +1,8 @@
 package datamodell;
 
+import java.util.ArrayList;
 import java.util.List;
+
 import GUI.EventTypes;
 
 /**
@@ -18,12 +20,12 @@ public class Event {
 	private String locale; //The locale chosen for this event
 	private String description;
 	private String title;
-	private List<EventMaker> participants; //Holds all participants in event, for easy notification 
+	private ArrayList<EventMaker> participants; //Holds all participants in event, for easy notification 
 	private EventMaker admin; //administrator (creator) of event
 	private EventTypes eventTypes;
 	
 	//Constructor
-	public Event(EventMaker maker, String startDate, String endDate, String locale, String description, String title, List<EventMaker> participants,
+	public Event(EventMaker maker, String startDate, String endDate, String locale, String description, String title, ArrayList<EventMaker> participants,
 			EventTypes eventTypes) {
 		admin = maker;
 		this.startDate = startDate;
@@ -57,7 +59,7 @@ public class Event {
 	 * Add single participant to event
 	 * @param Employee participant
 	 */
-	public void addParticipants(Employee participant) {
+	public void addParticipants(EventMaker participant) {
 		participants.add(participant);
 	}
 	
@@ -65,7 +67,7 @@ public class Event {
 	 * Add list of participants to event
 	 * @param List participants
 	 */
-	public void addListParticipants(List<EventMaker> participants)
+	public void addListParticipants(ArrayList<EventMaker> participants)
 	{
 		participants.addAll(participants);
 	}

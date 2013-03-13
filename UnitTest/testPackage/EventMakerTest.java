@@ -1,22 +1,27 @@
 package testPackage;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import java.util.List;
 import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
+import GUI.EventTypes;
 import datamodell.Employee;
 import datamodell.Event;
+import datamodell.EventMaker;
 
 public class EventMakerTest {
 	
-	private Employee emp1, emp2, emp3;
+	private EventMaker emp1, emp2, emp3;
 	private Event event;
 	private String startDate = "15.03.2013 18:00";
 	private String endDate = "16.03.2013 02:00";
 	private String locale = "Samfundet";
 	private String description = "Skal drikke øl";
 	private String title = "Fest";
-	private ArrayList<Employee> participants;
+	private ArrayList<EventMaker> participants = new ArrayList<EventMaker>();
+	private EventTypes type;
 	
 	//Initialize necessary testing instances
 	@Before
@@ -25,12 +30,11 @@ public class EventMakerTest {
 		emp1 = new Employee("olav@firmax.com");
 		emp2 = new Employee("hans@firmax.com");
 		emp3 = new Employee("per@firmax.com");
-		participants = new ArrayList();
 		participants.add(emp2);
 		participants.add(emp3);
 		
 		//Create event, with emp1 as admin
-		event = new Event(emp1);
+		event = new Event(emp1, startDate, endDate, locale, description, title, participants, type);
 		event.setStartDate(startDate);
 		event.setEndDate(endDate);
 		event.setLocale(locale);
@@ -39,12 +43,6 @@ public class EventMakerTest {
 		event.addParticipants(emp2);
 		event.addParticipants(emp3);
 		
-	}
-	
-	//Method throws exception if wrong password or username, test fails if it doesn't
-	@Test(expected = Exception.class) 
-	public void loginTest() throws Exception {
-		emp.log_in("olav", "qwerty");
 	}
 	
 	//Asserts if createEvent makes sets fields correctly
@@ -68,7 +66,7 @@ public class EventMakerTest {
 	}
 	
 	//Returns true if participants have the invitation in their list
-	private boolean assertEmployeesInvited(ArrayList<Event> list2, ArrayList<Event> list3) {
+	private boolean assertEmployeesInvited(List<Event> list2, List<Event> list3) {
 		if(list2.isEmpty() || list3.isEmpty()) {
 			return false;
 		}
