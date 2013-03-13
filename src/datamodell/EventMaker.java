@@ -16,7 +16,7 @@ import java.util.List;
  */
 public abstract class EventMaker {
 	
-	private String email;
+	private String adminEmail;
 	private boolean[][] calendar;
 	private List<Event> events; //list of events this user is connected to
 	private List<Event> invitations; //TODO ensure accept and decline is handled
@@ -49,7 +49,7 @@ public abstract class EventMaker {
 			String endDate, String locale, EventTypes type, ArrayList<EventMaker> participants, 
 			Boolean lydVarsling, Boolean tekstVarsling) {
 		
-		Event event = new Event(this, startDate, endDate, locale, description, title, participants, type);
+		Event event = new Event(adminEmail, startDate, endDate, locale, description, title, participants, type);
 		return event;
 	}
 	
@@ -86,7 +86,7 @@ public abstract class EventMaker {
 	 */
 	public void deleteEvent(Event event) throws Exception {
 		
-		if(this != event.getAdmin()) throw new Exception("Cannot delete, user is not administrator");
+		if(adminEmail != event.getAdminEmail()) throw new Exception("Cannot delete, user is not administrator");
 		else if(events.contains(event))//user is admin and event is in his list
 		{
 			event.notifyDelete(); //tells everyone subscribing to event to delete it
@@ -135,11 +135,11 @@ public abstract class EventMaker {
 	}
 
 	public String getEmail() {
-		return email;
+		return adminEmail;
 	}
 
 	public void setEmail(String email) {
-		this.email = email;
+		this.adminEmail = email;
 	}
 	
 	public List<Event> getEvents() {

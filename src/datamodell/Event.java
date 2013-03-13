@@ -2,7 +2,7 @@ package datamodell;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import client.SocketClient;
 import GUI.EventTypes;
 
 /**
@@ -21,13 +21,14 @@ public class Event {
 	private String description;
 	private String title;
 	private ArrayList<EventMaker> participants; //Holds all participants in event, for easy notification 
-	private EventMaker admin; //administrator (creator) of event
+	private String adminEmail; //administrator (creator) of event
 	private EventTypes eventTypes;
+	private SocketClient socket = new SocketClient(server, port); //TODO
 	
 	//Constructor
-	public Event(EventMaker maker, String startDate, String endDate, String locale, String description, String title, ArrayList<EventMaker> participants,
+	public Event(String adminEmail, String startDate, String endDate, String locale, String description, String title, ArrayList<EventMaker> participants,
 			EventTypes eventTypes) {
-		admin = maker;
+		this.adminEmail = adminEmail;
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.locale = locale;
@@ -35,6 +36,7 @@ public class Event {
 		this.title = title;
 		this.participants = participants;
 		this.setEventTypes(eventTypes);
+		socket.createEventQuery(adminEmail, startDate, endDate, locale, description, title, participants, eventTypes);
 	}
 	
 	/**
@@ -56,52 +58,24 @@ public class Event {
 	}
 	
 	/**
-	 * Add single participant to event
-	 * @param Employee participant
-	 */
-	public void addParticipants(EventMaker participant) {
-		participants.add(participant);
-	}
-	
-	/**
 	 * Add list of participants to event
 	 * @param List participants
 	 */
-	public void addListParticipants(ArrayList<EventMaker> participants)
-	{
-		participants.addAll(participants);
+	public void addListParticipants(ArrayList<EventMaker> participants) {
+		participants.addAll(participants); //Adds participants to this.participants field
+		for(EventMaker e: participants) {
+			socket.addParticipantQuery(e); //Adds participants in database
+		}
 	}
 	
-	/**
-	 * The methods commented out may not be necessary depending on final GUI, as methods can be called directly from GUI
-	 * to the relevant class
-	 */
-	/*
-	//Reserve location in locales and set locale field here
-	public void reserveLocale(String locale, String start, String end) {
-		locales.setReservedLocale(locale, start, end);
-		setLocale(locale);
+	//Remove list of participants from event
+	public void removeParticipants(ArrayList<EventMaker> participants) {
+		participants.removeAll(participants); //Removes participants in this.participants field
+		for(EventMaker e: participants) {
+			socket.removeParticipantsQuery(e); //Removes participants in database
+		}
 	}
 	
-	//Fetch employees from database
-	public Employee[] getEmployeeList() { 
-		Employee[] employeeList = query.getEmployees();
-		return employeeList;
-	}
-
-	//Reserve a name as location (when location is not a meeting room)
-	public void reserveLocale(String name, Time start, Time end) {
-	Locale l = new Locale(name);
-	locales.setReservedLocale(l, start, end);
-	setLocale(l);
-	}
-
-	//Returns available locales' roomnumber (primary key for locale in database) in given timespan
-	public int[][] getAvailableLocales(Date start, Date end) {
-		return locales.getLocales(start, end);
-	}
-	*/
-
 	//Only getters and setters from here and down
 	public int getID() {
 		return ID;
@@ -155,12 +129,12 @@ public class Event {
 		return participants;
 	}
 	
-	public EventMaker getAdmin() {
-		return admin;
+	public String getAdminEmail() {
+		return adminEmail;
 	}
 
-	public void setAdmin(EventMaker admin) {
-		this.admin = admin;
+	public void setAdminEmail(String admin) {
+		this.adminEmail = admin;
 	}
 
 	public EventTypes getEventTypes() {
