@@ -191,7 +191,7 @@ public class MainProfileGUI extends JPanel {
 		westSouthLowerPanel.setPreferredSize(new Dimension(300, 290));
 		westSouthLowerPanel.setBackground(Color.WHITE);
 		
-		
+
 		
 		try {
 			ArrayList<Event> weekEvents = new Query().getThisWeeksEvents("@gmail.com", cal.getDate(), cal.getDate().getYear());
