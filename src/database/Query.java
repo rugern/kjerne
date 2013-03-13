@@ -6,20 +6,27 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 
 import com.mysql.jdbc.PreparedStatement;
+import datamodell.*;
+import datamodell.Employee;
+import datamodell.Event;
+import datamodell.EventMaker;
 
 public class Query {
 
 	ResultSet resultSet;
 
-	public void addEmployee(Connection connection, String email, String name,
-			String username, String address, Integer telephonenumber,
-			String password) throws SQLException {
+	Conn conn = new Conn();
+
+	public void addEmployee(String email, String name, String username,
+			String address, Integer telephonenumber, String password)
+			throws SQLException {
 
 		try {
-			PreparedStatement preperadStatement = (PreparedStatement) connection
+			PreparedStatement preperadStatement = (PreparedStatement) conn.connection
 					.prepareStatement("INSERT INTO Employee(Email, Name, username, address, TLF, password ) VALUES (?,?,?,?,?,?)");
 
 			preperadStatement.setString(1, email);
@@ -36,15 +43,23 @@ public class Query {
 		}
 
 	}
-	
-	
 
-	public void addEvent(Connection connection, String title, String email,
-			String startTime, String endTime, String description,
-			String locale, EventTypes eventtype, int roomNr)
-			throws SQLException {
+	public void getRoomsAndDate() throws SQLException {
 
-		PreparedStatement preparedStatement = (PreparedStatement) connection
+		String sql = "SELECT Roomnr, StartTime, EndTime FROM Locale AS L INNER JOIN Event AS E ON (L.Roomnr=E.Roomnr)";
+
+		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
+				.prepareStatement(sql);
+
+		ResultSet resultSet = preparedStatement.executeQuery();
+
+	}
+
+	public void addEvent(String title, String email, String startTime,
+			String endTime, String description, String locale,
+			EventTypes eventtype, int roomNr) throws SQLException {
+
+		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
 				.prepareStatement("INSERT INTO Event(Title, Email, StartTime, EndTime, Description, Locale, MeetingOrEvent, RoomNR ) VALUES (?,?,?,?,?,?,?,?)");
 
 		preparedStatement.setString(1, title);
@@ -60,13 +75,11 @@ public class Query {
 
 	}
 
-	public void updateEvent(Connection connection,
-			String title, String email,
-			String startTime, String endTime, String description,
-			String locale, EventTypes eventtype, int roomNr, int eventID)
-			throws SQLException {
+	public void updateEvent(String title, String email, String startTime,
+			String endTime, String description, String locale,
+			EventTypes eventtype, int roomNr, int eventID) throws SQLException {
 
-		PreparedStatement preparedStatement = (PreparedStatement) connection
+		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
 				.prepareStatement("UPDATE Event SET Title = " + title
 						+ ", Email = " + email + ", StartTime = " + startTime
 						+ ",  EndTime =" + endTime + ", Description ="
@@ -79,10 +92,10 @@ public class Query {
 
 	// Use own email if you want events associated with yourself, use
 	// employeeEmail if you want events associated with an employee
-	public void getEventByDate(Connection connection, String email,
-			String startDate) throws SQLException {
+	public void getEventByDate(String email, String startDate)
+			throws SQLException {
 
-		PreparedStatement preparedStatement = (PreparedStatement) connection
+		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
 				.prepareStatement("SELECT Title, Email, StartDate, Place FROM event WHERE StartDate=? AND Email =? ");
 
 		preparedStatement.setString(1, startDate);
@@ -99,13 +112,14 @@ public class Query {
 
 	}
 
-	public void getThisWeeksEvents(Connection connection, String email,
-			Date date, int year) throws ParseException, SQLException {
+	public ArrayList<Event> getThisWeeksEvents(String email, Date date, int year)
+			throws ParseException, SQLException {
+
 		DateToStringModifier dtsm = new DateToStringModifier();
 
 		int weekNumber = dtsm.getWeeksNumber(dtsm.getCompleteDate(date, year));
 
-		PreparedStatement preparedStatement = (PreparedStatement) connection
+		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
 				.prepareStatement("SELECT Title, Email, StartDate, Place FROM event WHERE weekNumber=? AND Email =? ");
 
 		preparedStatement.setInt(1, weekNumber);
@@ -113,6 +127,27 @@ public class Query {
 
 		resultSet = preparedStatement.executeQuery();
 
+		ArrayList<Event> weekEventList = new ArrayList<Event>();
+		ArrayList<Event> employeeList = new ArrayList<Event>();
+
+		while (resultSet.next()) {
+
+			String sDate = resultSet.getString("StartDate");
+			MainProfileGUI mpg = new MainProfileGUI();
+
+			String title = resultSet.getString("Title");
+			String ownerMail = resultSet.getString("Email");
+			int eventID = resultSet.getInt("EventID");
+
+			EventMaker eventMaker = new Employee(email);
+
+			Event testEvent = new Event(eventID, eventMaker.getEmail(), sDate,
+					"2013/06/06", "locale", "Dette er en test", employeeList,
+					EventTypes.appointment);
+
+		}
+
+		return weekEventList;
 	}
 
 }

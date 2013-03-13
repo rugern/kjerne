@@ -26,7 +26,7 @@ public class Event {
 	private SocketClient socket = new SocketClient(server, port); //TODO
 	
 	//Constructor
-	public Event(String adminEmail, String startDate, String endDate, String locale, String description, String title, ArrayList<EventMaker> participants,
+	public Event(int ID, String adminEmail, String startDate, String endDate, String locale, String description, String title, ArrayList<EventMaker> participants,
 			EventTypes eventTypes) {
 		this.adminEmail = adminEmail;
 		this.startDate = startDate;

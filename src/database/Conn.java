@@ -11,45 +11,43 @@ import com.mysql.jdbc.PreparedStatement;
 
 public class Conn {
 
-	public static void main(String args[]) throws SQLException {
-
-		Connection connection = null;
-		Statement statement = null;
-
-		Query query = new Query();
+	Connection connection;
+	Statement statement;
+	
+	public Conn(){
 
 		try {
+			
 			System.out.println("Connecting to database");
+			
 			Class.forName("com.mysql.jdbc.Driver");
-			
-			 connection = DriverManager.getConnection(
-			 "jdbc:mysql://localhost:3306/fellesprosjekt", "root", "");
 
-//			connection = DriverManager.getConnection(
-//					"jdbc:mysql://mysql.stud.ntnu.no:3306/nilsiru_felles",
-//					"nilsiru_gruppe11@cura.itea.ntnu.no", "felles");
-
-			statement = connection.createStatement();
-
-			query.addEvent(connection, "test", "testing@gmail.com", null, null, null, "hydro", null, (Integer) null);
-			System.out.println("entered");
+			connection = DriverManager.getConnection(
+					"jdbc:mysql://localhost:3306/fellesprosjekt", "root", "");
 			
-			
-			query.getEventByDate(connection, "@gmail.com", "2013mar01");
-			
-
 		} catch (ClassNotFoundException e) {
 			System.out.println("Error " + e.getMessage());
 		} catch (SQLException e) {
 			System.out.println("Error " + e.getMessage());
-		} finally {
-			if (connection != null) {
-				connection.close();
-			}
-			if (statement != null) {
-				statement.close();
-			}
 		}
+
+		// connection = DriverManager.getConnection(
+		// "jdbc:mysql://mysql.stud.ntnu.no:3306/nilsiru_felles",
+		// "nilsiru_gruppe11@cura.itea.ntnu.no", "felles");
+
+	}
+
+	public static void main(String args[]) throws SQLException {
+
+		Query query = new Query();
+
+//		query.addEvent("test", "testing@gmail.com", null, null,
+//				null, "hydro", null, (Integer) null);
+		
+		System.out.println("entered");
+
+		query.getEventByDate("@gmail.com", "2013mar01");
+
 	}
 
 	public static void addEmployee(Connection connection,

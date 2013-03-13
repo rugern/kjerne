@@ -11,6 +11,7 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.ListCellRenderer;
 
 import com.toedter.calendar.JCalendar;
+
+import database.Query;
+import datamodell.Event;
 
 public class MainProfileGUI extends JPanel {
 
@@ -65,6 +69,8 @@ public class MainProfileGUI extends JPanel {
 	JList sentRequestList;
 	JLabel chosenDayEvent;
 
+	DefaultListModel weekModel;
+	
 	public static void main(String[] args) {
 		JFrame profileFrame = new JFrame("Min Profil");
 		profileFrame.getContentPane().add(new MainProfileGUI());
@@ -182,8 +188,12 @@ public class MainProfileGUI extends JPanel {
 		westSouthLowerPanel.setPreferredSize(new Dimension(300, 290));
 		westSouthLowerPanel.setBackground(Color.WHITE);
 		
-		weekEventsList = new JList(testModel);
+		weekEventsList = new JList(weekModel);
 		weekEventsList.setCellRenderer(new EventRenderer());
+		
+		
+		ArrayList<Event> weeklyEvent = new Query().getThisWeeksEvents(email, date, year);
+		
 		weekEventsList.setFixedCellWidth(280);
 		weekEventsList.setFixedCellHeight(30);
 		weekEventsList.addMouseListener(new EventInfo());
