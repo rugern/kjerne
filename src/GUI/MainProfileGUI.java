@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,6 +62,8 @@ public class MainProfileGUI extends JPanel {
 
 	AddingEventGUI addingEventGUI = new AddingEventGUI();
 	EmployeeCalenderGUI employeeCalenderGUI = new EmployeeCalenderGUI();
+	
+	DateToStringModifier dtsm;
 
 	JCalendar cal;
 	JList chosenDayEventList;
@@ -188,12 +191,23 @@ public class MainProfileGUI extends JPanel {
 		westSouthLowerPanel.setPreferredSize(new Dimension(300, 290));
 		westSouthLowerPanel.setBackground(Color.WHITE);
 		
+		
+		
+		try {
+			ArrayList<Event> weekEvents = new Query().getThisWeeksEvents("@gmail.com", cal.getDate(), cal.getDate().getYear());
+			weekModel = new DefaultListModel();
+			weekModel.addElement(weekEventsList);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
 		weekEventsList = new JList(weekModel);
 		weekEventsList.setCellRenderer(new EventRenderer());
-		
-		
-		ArrayList<Event> weeklyEvent = new Query().getThisWeeksEvents(email, date, year);
-		
 		weekEventsList.setFixedCellWidth(280);
 		weekEventsList.setFixedCellHeight(30);
 		weekEventsList.addMouseListener(new EventInfo());
@@ -468,15 +482,11 @@ public class MainProfileGUI extends JPanel {
 				
 				chosenDayEvent.setText(toDateLabel());
 				
-				DateToStringModifier dtsm = new DateToStringModifier();
+				dtsm = new DateToStringModifier();
 				
 				System.out.println(dtsm.getCompleteDate(cal.getDate(), cal.getDate().getYear()));
 				
-				try {
-					System.out.println("Ukenummer: " + dtsm.getWeeksNumber( dtsm.getCompleteDate(cal.getDate(), cal.getDate().getYear())));
-				} catch (ParseException e1) {
-					e1.getMessage();
-				}
+				System.out.println("Ukenummer: " + dtsm.getWeeksNumber( dtsm.getCompleteDate(cal.getDate(), cal.getDate().getYear())));
 			}
 		}
 	}

@@ -23,7 +23,7 @@ public class Event {
 	private ArrayList<EventMaker> participants; //Holds all participants in event, for easy notification 
 	private String adminEmail; //administrator (creator) of event
 	private EventTypes eventTypes;
-	private SocketClient socket = new SocketClient(server, port); //TODO
+	//private SocketClient socket = new SocketClient(server, port); //TODO
 	
 	//Constructor
 	public Event(int ID, String adminEmail, String startDate, String endDate, String locale, String description, String title, ArrayList<EventMaker> participants,
@@ -36,7 +36,7 @@ public class Event {
 		this.title = title;
 		this.participants = participants;
 		this.setEventTypes(eventTypes);
-		socket.createEventQuery(adminEmail, startDate, endDate, locale, description, title, participants, eventTypes);
+		//socket.createEventQuery(adminEmail, startDate, endDate, locale, description, title, participants, eventTypes);
 	}
 	
 	/**
@@ -64,7 +64,7 @@ public class Event {
 	public void addListParticipants(ArrayList<EventMaker> participants) {
 		participants.addAll(participants); //Adds participants to this.participants field
 		for(EventMaker e: participants) {
-			socket.addParticipantQuery(e); //Adds participants in database
+			//socket.addParticipantQuery(e); //Adds participants in database
 		}
 	}
 	
@@ -72,7 +72,7 @@ public class Event {
 	public void removeParticipants(ArrayList<EventMaker> participants) {
 		participants.removeAll(participants); //Removes participants in this.participants field
 		for(EventMaker e: participants) {
-			socket.removeParticipantsQuery(e); //Removes participants in database
+			//socket.removeParticipantsQuery(e); //Removes participants in database
 		}
 	}
 	
