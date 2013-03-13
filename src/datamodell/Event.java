@@ -87,10 +87,8 @@ public class Event {
 		Employee[] employeeList = query.getEmployees();
 		return employeeList;
 	}
-	 */
 
 	//Reserve a name as location (when location is not a meeting room)
-	/*	
 	public void reserveLocale(String name, Time start, Time end) {
 	Locale l = new Locale(name);
 	locales.setReservedLocale(l, start, end);
