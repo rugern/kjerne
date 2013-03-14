@@ -93,24 +93,45 @@ public class Query {
 
 	// Use own email if you want events associated with yourself, use
 	// employeeEmail if you want events associated with an employee
-	public void getEventByDate(String email, String startDate)
+	public ArrayList<Event> getEventByDate(String email, Date date, int year)
 			throws SQLException {
 
+		DateToStringModifier dtsm = new DateToStringModifier();
+		
+		String startDate = dtsm.getCompleteDate(date, year);
+		
 		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
-				.prepareStatement("SELECT Title, Email, StartDate, Place FROM event WHERE StartDate=? AND Email =? ");
+				.prepareStatement("SELECT Event.EventID, Event.Email, StartTime, EndTime, StartDate, EndDate, Description, Place, State, Title, MeetingOrEvent, Roomnr, weekNR FROM Event, Participant WHERE Participant.Email= ? AND StartDate = ?");
 
-		preparedStatement.setString(1, startDate);
-		preparedStatement.setString(2, email);
+		preparedStatement.setString(1, email);
+		preparedStatement.setString(2, startDate);
 
 		resultSet = preparedStatement.executeQuery();
 
+		ArrayList<Event> daysEventList = new ArrayList<Event>();
+		ArrayList<EventMaker> employeeList = new ArrayList<EventMaker>();
+
 		while (resultSet.next()) {
 
-			String sDate = resultSet.getString("StartDate");
-			System.out.println(sDate);
+			int eventID = resultSet.getInt("EventID");
+			// email from parameters
+			String startTime = resultSet.getString("StartTime");
+			String endTime = resultSet.getString("EndTime");
+			String startingDate = resultSet.getString("StartDate");
+			String endDate = resultSet.getString("EndDate");
+			String description = resultSet.getString("Description");
+			String place = resultSet.getString("Place");
+			String state = resultSet.getString("State");
+			String title = resultSet.getString("Title");
+			String meetingOrEvent = resultSet.getString("MeetingOrEvent");
+			int roomNr = resultSet.getInt("RoomNR");
 
+			daysEventList.add(new Event(eventID, email, startingDate, endDate,
+					startTime, endTime, place, description, title,
+					employeeList, EventTypes.appointment));
 		}
 
+		return daysEventList;
 	}
 
 	public ArrayList<Event> getThisWeeksEvents(String email, Date date, int year)
@@ -120,30 +141,40 @@ public class Query {
 
 		int weekNumber = dtsm.getWeeksNumber(dtsm.getCompleteDate(date, year));
 
-		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
-				.prepareStatement("SELECT Title, Email, StartDate, Place, EventID FROM event WHERE weekNR=? AND Email =? ");
-
-		preparedStatement.setInt(1, weekNumber);
-		preparedStatement.setString(2, email);
-
-		ResultSet resultSet = preparedStatement.executeQuery();
-
 		ArrayList<Event> weekEventList = new ArrayList<Event>();
 		ArrayList<EventMaker> employeeList = new ArrayList<EventMaker>();
 
+		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
+				.prepareStatement("SELECT Event.EventID, Event.Email, StartTime, EndTime, StartDate, EndDate, Description, Place, State, Title, MeetingOrEvent, Roomnr, weekNR FROM Event, Participant WHERE Participant.Email= ? AND Event.weekNR = ?");
+
+		preparedStatement.setString(1, email);
+		preparedStatement.setInt(2, weekNumber);
+
+		resultSet = preparedStatement.executeQuery();
+
 		while (resultSet.next()) {
 
-			String sDate = resultSet.getString("StartDate");
-			String title = resultSet.getString("Title");
-			String ownerMail = resultSet.getString("Email");
 			int eventID = resultSet.getInt("EventID");
+			// email from parameters
+			String startTime = resultSet.getString("StartTime");
+			String endTime = resultSet.getString("EndTime");
+			String startDate = resultSet.getString("StartDate");
+			String endDate = resultSet.getString("EndDate");
+			String description = resultSet.getString("Description");
+			String place = resultSet.getString("Place");
+			String state = resultSet.getString("State");
+			String title = resultSet.getString("Title");
+			String meetingOrEvent = resultSet.getString("MeetingOrEvent");
+			int roomNr = resultSet.getInt("RoomNR");
+			int weekNR = resultSet.getInt("weekNR");
 
-			weekEventList.add(new Event(eventID, email, sDate, "2013/12/12",
-					"place", "test", "Mitt møte", employeeList,
-					EventTypes.appointment));
-
+			weekEventList.add(new Event(eventID, email, startDate, endDate,
+					startTime, endTime, place, description, title,
+					employeeList, EventTypes.appointment));
 		}
-
+		
+		conn.connection.close();
+		
 		return weekEventList;
 	}
 

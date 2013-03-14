@@ -36,7 +36,7 @@ public class DateToStringModifier {
 			dateString = "0" + date.getDate();
 		}
 
-		return monthString + "/" + dateString + "/" + yearString;
+		return  dateString + "/" + monthString  + "/"+ yearString;
 	}
 
 	public int getWeeksNumber(String dateString) {
@@ -46,7 +46,7 @@ public class DateToStringModifier {
 		Date date;
 		int week = 0;
 		cal = Calendar.getInstance();
-		sdf = new SimpleDateFormat("MM/dd/yyyy");
+		sdf = new SimpleDateFormat("dd/MM/yyyy");
 		
 		try {
 			date = sdf.parse(dateString);

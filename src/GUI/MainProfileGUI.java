@@ -62,7 +62,7 @@ public class MainProfileGUI extends JPanel {
 
 	AddingEventGUI addingEventGUI = new AddingEventGUI();
 	EmployeeCalenderGUI employeeCalenderGUI = new EmployeeCalenderGUI();
-	
+
 	DateToStringModifier dtsm;
 
 	JCalendar cal;
@@ -73,7 +73,8 @@ public class MainProfileGUI extends JPanel {
 	JLabel chosenDayEvent;
 
 	DefaultListModel weekModel;
-	
+	DefaultListModel todaysEventModel;
+
 	public static void main(String[] args) {
 		JFrame profileFrame = new JFrame("Min Profil");
 		profileFrame.getContentPane().add(new MainProfileGUI());
@@ -120,12 +121,12 @@ public class MainProfileGUI extends JPanel {
 		receivedRequest = new JPanel();
 		receivedRequest.setBackground(Color.WHITE);
 		receivedRequest.setPreferredSize(new Dimension(300, 280));
-		
+
 		receivedRequestList = new JList(testModel);
 		receivedRequestList.setFixedCellHeight(30);
-//		receivedRequestList.setCellRenderer(new EventRenderer());
+		// receivedRequestList.setCellRenderer(new EventRenderer());
 		receivedRequestList.addMouseListener(new EventInfo());
-		
+
 		JScrollPane receivedRequestScrollPane = new JScrollPane(
 				receivedRequestList);
 		receivedRequestScrollPane.setBorder(null);
@@ -134,19 +135,18 @@ public class MainProfileGUI extends JPanel {
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		receivedRequestScrollPane
 				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		
+
 		receivedRequest.add(receivedRequestScrollPane, BorderLayout.SOUTH);
 
-		
 		sentRequest = new JPanel();
 		sentRequest.setPreferredSize(new Dimension(300, 250));
 		sentRequest.setBackground(Color.WHITE);
-		
+
 		sentRequestList = new JList(testModel);
 		sentRequestList.setFixedCellHeight(30);
-//		sentRequestList.setCellRenderer(new EventRenderer());
+		sentRequestList.setCellRenderer(new EventRenderer());
 		sentRequestList.addMouseListener(new EventInfo());
-		
+
 		JScrollPane sentRequestScrollPane = new JScrollPane(sentRequestList);
 		sentRequestScrollPane.setBorder(null);
 		sentRequestScrollPane.setPreferredSize(new Dimension(290, 180));
@@ -180,9 +180,9 @@ public class MainProfileGUI extends JPanel {
 		westNorthPanel = new JPanel();
 		westNorthPanel.setPreferredSize(new Dimension(300, 300));
 		westNorthPanel.setBackground(new Color(0x51bdf4));
-		
+
 		JLabel administrate = new JLabel("Administrer");
-		
+
 		westNorthPanel.add(administrate);
 		westNorthPanel.add(westNorthWhitePanel, BorderLayout.NORTH);
 
@@ -190,17 +190,18 @@ public class MainProfileGUI extends JPanel {
 		westSouthLowerPanel = new JPanel();
 		westSouthLowerPanel.setPreferredSize(new Dimension(300, 290));
 		westSouthLowerPanel.setBackground(Color.WHITE);
-		
 
-		
 		try {
-			ArrayList<Event> weekEvents = new Query().getThisWeeksEvents("@gmail.com", cal.getDate(), cal.getDate().getYear());
+			ArrayList<Event> weekEvents = new Query().getThisWeeksEvents(
+					"@gmail.com", cal.getDate(), cal.getDate().getYear());
+			
 			weekModel = new DefaultListModel();
-			
+			weekModel.addElement(new String());
+
 			for (int i = 0; i < weekEvents.size(); i++) {
-			weekModel.addElement(weekEvents.get(i));
-			}	
-			
+				weekModel.addElement(weekEvents.get(i));
+			}
+
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -208,26 +209,26 @@ public class MainProfileGUI extends JPanel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		weekEventsList = new JList(weekModel);
 		weekEventsList.setCellRenderer(new EventRenderer());
 		weekEventsList.setFixedCellWidth(280);
 		weekEventsList.setFixedCellHeight(30);
 		weekEventsList.addMouseListener(new EventInfo());
-		
+
 		JScrollPane weekEventScrollPane = new JScrollPane(weekEventsList);
 		weekEventScrollPane.setBorder(null);
 		weekEventScrollPane
 				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		weekEventScrollPane.setPreferredSize(new Dimension(290, 255));
-		
+
 		westSouthLowerPanel.add(weekEventScrollPane, BorderLayout.SOUTH);
 
 		// WestSouthPanel
 		westSouthPanel = new JPanel();
 		westSouthPanel.setPreferredSize(new Dimension(300, 300));
 		westSouthPanel.setBackground(new Color(0xe35e6e));
-		
+
 		JLabel todaysEvents = new JLabel(
 				"             Ukens avtaler             ");
 		westSouthPanel.add(todaysEvents);
@@ -237,10 +238,9 @@ public class MainProfileGUI extends JPanel {
 		eastNorthPanel = new JPanel();
 		eastNorthPanel.setPreferredSize(new Dimension(300, 300));
 		eastNorthPanel.setBackground(new Color(0x00b099));
-		
-		JLabel calenderLabel = new JLabel(
-				"Kalender");
-		
+
+		JLabel calenderLabel = new JLabel("Kalender");
+
 		eastNorthPanel.add(calenderLabel, BorderLayout.NORTH);
 		eastNorthPanel.add(cal, BorderLayout.SOUTH);
 
@@ -249,11 +249,13 @@ public class MainProfileGUI extends JPanel {
 		eastSouthUpperPanel.setPreferredSize(new Dimension(300, 210));
 		eastSouthUpperPanel.setBackground(Color.WHITE);
 
-		chosenDayEventList = new JList(testModel);
+		todaysEventModel = new DefaultListModel();
+
+		chosenDayEventList = new JList(todaysEventModel);
 		chosenDayEventList.setFixedCellHeight(30);
 		chosenDayEventList.addMouseListener(new EventInfo());
-//		chosenDayEventList.setCellRenderer(new EventRenderer());
-		
+		chosenDayEventList.setCellRenderer(new EventRenderer());
+
 		JScrollPane chosenDayEventScrollPane = new JScrollPane(
 				chosenDayEventList);
 		chosenDayEventScrollPane.setBorder(null);
@@ -262,16 +264,16 @@ public class MainProfileGUI extends JPanel {
 				.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		chosenDayEventScrollPane
 				.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		
+
 		eastSouthUpperPanel.add(chosenDayEventScrollPane, BorderLayout.SOUTH);
 
 		// EastSouthLowerPanel
 		JButton changeEventButton = new JButton("Endre hendelse");
 		changeEventButton.addActionListener(new changeEvent());
-		
+
 		JButton deleteEventButton = new JButton("Slett hendelse");
 		deleteEventButton.addActionListener(new deleteEvent());
-		
+
 		eastSouthLowerPanel = new JPanel();
 		eastSouthLowerPanel.setPreferredSize(new Dimension(300, 50));
 		eastSouthLowerPanel.setBackground(Color.WHITE);
@@ -296,7 +298,7 @@ public class MainProfileGUI extends JPanel {
 
 		eastSouthPanel.add(chosenDayEvent);
 		eastSouthPanel.add(eastSouthWhitePanel, BorderLayout.SOUTH);
-		
+
 		// MainWestPanel
 		mainWestPanel = new JPanel();
 		mainWestPanel.setPreferredSize(new Dimension(300, 600));
@@ -324,7 +326,7 @@ public class MainProfileGUI extends JPanel {
 				.addActionListener(new cancelNewEvent());
 		addingEventGUI.completeNewEventButton
 				.addActionListener(new completeAddNewEvent());
-		
+
 		addingFrame.setMinimumSize(new Dimension(480, 450));
 		addingFrame.setMaximumSize(new Dimension(480, 450));
 		addingFrame.setVisible(false);
@@ -332,7 +334,7 @@ public class MainProfileGUI extends JPanel {
 
 		// Creating employeeCalender frame
 		employeeCalenderGUI.closeEmployeeButton
-		.addActionListener(new doneViewingEmployeeCalender());
+				.addActionListener(new doneViewingEmployeeCalender());
 
 		employeeCalenderFrame.setMaximumSize(new Dimension(650, 350));
 		employeeCalenderFrame.setMinimumSize(new Dimension(650, 350));
@@ -357,13 +359,14 @@ public class MainProfileGUI extends JPanel {
 				.getYear() + 1900));
 	}
 
-	//ActionsListeners
-	public class changeEvent implements ActionListener{
+	// ActionsListeners
+	public class changeEvent implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// TODO Auto-generated method stub
-			addingEventGUI.titleTextField.setText("Settes ut ifra verdiene til valgt hendelse");
+			addingEventGUI.titleTextField
+					.setText("Settes ut ifra verdiene til valgt hendelse");
 			addingFrame.setVisible(true);
 		}
 	}
@@ -422,21 +425,27 @@ public class MainProfileGUI extends JPanel {
 
 	}
 
-	//MouseListeners
+	// MouseListeners
 	public class EventInfo implements MouseListener {
 
 		Event event;
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
-			event = (Event) ((JList) e.getSource()).getSelectedValue();
-			if (e.getClickCount() == 2) {
-				if (e.getSource() == chosenDayEventList
-						|| e.getSource() == weekEventsList || e.getSource() == sentRequestList) {
-					infoViewer();
-				} else if (e.getSource() == receivedRequestList) {
-					answerRequestViewer();
+			try {
+				event = (Event) ((JList) e.getSource()).getSelectedValue();
+				if (e.getClickCount() == 2) {
+					if (e.getSource() == chosenDayEventList
+							|| e.getSource() == weekEventsList
+							|| e.getSource() == sentRequestList) {
+						infoViewer();
+					} else if (e.getSource() == receivedRequestList) {
+						answerRequestViewer();
+					}
 				}
+
+			} catch (Exception e2) {
+				// TODO: handle exception
 			}
 		}
 
@@ -476,33 +485,49 @@ public class MainProfileGUI extends JPanel {
 
 	}
 
-	//PropertyChangelisteners
+	// PropertyChangelisteners
 	public class dateChoser implements PropertyChangeListener {
 
 		public void propertyChange(PropertyChangeEvent e) {
 			if (e.getSource() == cal) {
-				
 				chosenDayEvent.setText(toDateLabel());
-				
-				dtsm = new DateToStringModifier();
-				
-				System.out.println(dtsm.getCompleteDate(cal.getDate(), cal.getDate().getYear()));
-				
-				System.out.println("Ukenummer: " + dtsm.getWeeksNumber( dtsm.getCompleteDate(cal.getDate(), cal.getDate().getYear())));
+				todaysEventModel.clear();
+				try {
+					ArrayList<Event> todaysEventsList = new Query()
+							.getEventByDate("@gmail.com", cal.getDate(), cal
+									.getDate().getYear());
+					for (int i = 0; i < todaysEventsList.size(); i++) {
+						todaysEventModel.addElement(todaysEventsList.get(i));
+					}
+				} catch (SQLException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
 			}
 		}
 	}
-	
-	//Renderer 
+
+	// Renderer
 	public class EventRenderer extends JLabel implements ListCellRenderer {
 
 		@Override
 		public Component getListCellRendererComponent(JList arg0, Object arg1,
 				int arg2, boolean isSelected, boolean arg4) {
-			
-			Event e = (Event) arg1;
-			
-			setText("Title: " + e.getTitle() + " : " + e.getDescription() + " Dato: " + e.getStartDate());
+
+			try {
+				Event e = (Event) arg1;
+				if (e.getTitle().length() < 10
+						|| e.getDescription().length() < 15) {
+					e.setTitle(e.getTitle() + "                 ");
+					e.setDescription(e.getDescription() + "               ");
+				}
+				setText(e.getTitle().substring(0, 10) + "    "
+						+ e.getDescription().substring(0, 15) + "      "
+						+ e.getStartTime() + "-" + e.getEndTime() + " "
+						+ e.getStartDate().substring(0, 5));
+			} catch (Exception e) {
+				setText("Tittel                  Beskrivelse                 Tid ");
+			}
 
 			if (isSelected) {
 				setForeground(Color.RED);

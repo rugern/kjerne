@@ -22,18 +22,22 @@ public class Event {
 	private String locale; //The locale chosen for this event
 	private String description;
 	private String title;
+	private String startTime;
+	private String endTime;
 	private ArrayList<EventMaker> participants; //Holds all participants in event, for easy notification 
 	private String adminEmail; //administrator (creator) of event
 	private EventTypes eventTypes;
 	//private SocketClient socket = new SocketClient(server, port); //TODO
 	
 	//Constructor
-	public Event(int ID, String adminEmail, String startDate, String endDate, String locale, String description, String title, ArrayList<EventMaker> participants,
+	public Event(int ID, String adminEmail, String startDate, String endDate, String startTime, String endTime,String locale, String description, String title, ArrayList<EventMaker> participants,
 			EventTypes eventTypes) {
 		this.adminEmail = adminEmail;
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.locale = locale;
+		this.startTime = startTime;
+		this.endTime = endTime; 
 		this.description = description;
 		this.title = title;
 		this.participants = participants;
@@ -79,6 +83,22 @@ public class Event {
 	}
 	
 	//Only getters and setters from here and down
+	
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+	public String getStartTime() {
+		return startTime;
+	}
+	
+	public String getEndTime() {
+		return endTime;
+	}
+	
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
+	}
+
 	public int getID() {
 		return ID;
 	}

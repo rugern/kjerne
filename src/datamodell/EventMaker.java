@@ -50,10 +50,10 @@ public abstract class EventMaker {
 	 * @return the created Event object
 	 */
 	public Event createEvent(int ID, String title, String description, String startDate, 
-			String endDate, String locale, EventTypes type, ArrayList<EventMaker> participants, 
+			String endDate, String startTime, String endTime, String locale, EventTypes type, ArrayList<EventMaker> participants, 
 			Boolean lydVarsling, Boolean tekstVarsling) {
 		
-		Event event = new Event(0, email, startDate, endDate, locale, description, title, participants, type);
+		Event event = new Event(0, email, startDate, endDate, startTime, endTime, locale, description, title,  participants, type);
 		return event;
 	}
 	

@@ -18,12 +18,12 @@ public class Conn {
 
 		try {
 			
-			System.out.println("Connecting to database");
-			
 			Class.forName("com.mysql.jdbc.Driver");
 
 			connection = DriverManager.getConnection(
 					"jdbc:mysql://localhost:3306/fellesprosjekt", "root", "");
+			
+			System.out.println("opened");
 			
 		} catch (ClassNotFoundException e) {
 			System.out.println("Error " + e.getMessage());
@@ -46,7 +46,7 @@ public class Conn {
 		
 		System.out.println("entered");
 
-		query.getEventByDate("@gmail.com", "2013mar01");
+//		query.getEventByDate("@gmail.com", "2013mar01");
 
 	}
 
