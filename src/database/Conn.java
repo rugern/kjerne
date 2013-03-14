@@ -23,8 +23,6 @@ public class Conn {
 			connection = DriverManager.getConnection(
 					"jdbc:mysql://localhost:3306/fellesprosjekt", "root", "");
 			
-			System.out.println("opened");
-			
 		} catch (ClassNotFoundException e) {
 			System.out.println("Error " + e.getMessage());
 		} catch (SQLException e) {

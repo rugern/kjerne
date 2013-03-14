@@ -75,6 +75,8 @@ public class MainProfileGUI extends JPanel {
 	DefaultListModel weekModel;
 	DefaultListModel todaysEventModel;
 
+	ArrayList<Event> todaysEventsList;
+
 	public static void main(String[] args) {
 		JFrame profileFrame = new JFrame("Min Profil");
 		profileFrame.getContentPane().add(new MainProfileGUI());
@@ -194,7 +196,7 @@ public class MainProfileGUI extends JPanel {
 		try {
 			ArrayList<Event> weekEvents = new Query().getThisWeeksEvents(
 					"@gmail.com", cal.getDate(), cal.getDate().getYear());
-			
+
 			weekModel = new DefaultListModel();
 			weekModel.addElement(new String());
 
@@ -401,13 +403,36 @@ public class MainProfileGUI extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (JOptionPane.showConfirmDialog(null, "Vil du slette @event?",
-					"Slette event?", JOptionPane.YES_NO_OPTION,
-					JOptionPane.QUESTION_MESSAGE) == 0) {
-				// delete event
+			Event event = (Event) chosenDayEventList.getSelectedValue();
+			
+			if (event.getAdminEmail().equals("@gmail.com")) {
+				if (JOptionPane
+						.showConfirmDialog(null,
+								"Vil du slette " + event.getTitle() + " ?",
+								"Slette event?", JOptionPane.YES_NO_OPTION,
+								JOptionPane.QUESTION_MESSAGE) == 0) {
+					try {
+						System.out.println(event.getID() + " = ID");
+						((Query) new Query()).deleteEvent(event.getID(),
+								"@gmail.com");
+						todaysEventsList = new Query().getEventByDate(
+								"@gmail.com", cal.getDate(), cal.getDate()
+										.getYear());
+						todaysEventModel.clear();
+						for (int i = 0; i < todaysEventsList.size(); i++) {
+							todaysEventModel
+									.addElement(todaysEventsList.get(i));
+						}
+
+					} catch (SQLException e1) {
+						System.out.println("Error on delete: ");
+					}
+				}
 			}
+		else{
+			JOptionPane.showMessageDialog(null, "Du kan ikke slette eventen da du ikke opprettet den");
 		}
-	}
+	}}
 
 	public class viewEmployeeCalender implements ActionListener {
 
@@ -496,6 +521,7 @@ public class MainProfileGUI extends JPanel {
 					ArrayList<Event> todaysEventsList = new Query()
 							.getEventByDate("@gmail.com", cal.getDate(), cal
 									.getDate().getYear());
+					todaysEventModel.addElement(new String());
 					for (int i = 0; i < todaysEventsList.size(); i++) {
 						todaysEventModel.addElement(todaysEventsList.get(i));
 					}
@@ -516,14 +542,14 @@ public class MainProfileGUI extends JPanel {
 
 			try {
 				Event e = (Event) arg1;
-				if (e.getTitle().length() < 10
+				if (e.getTitle().length() < 15
 						|| e.getDescription().length() < 15) {
-					e.setTitle(e.getTitle() + "                 ");
-					e.setDescription(e.getDescription() + "               ");
+					e.setTitle(e.getTitle() + "                  ");
+					e.setDescription(e.getDescription() + "                  ");
 				}
-				setText(e.getTitle().substring(0, 10) + "    "
-						+ e.getDescription().substring(0, 15) + "      "
-						+ e.getStartTime() + "-" + e.getEndTime() + " "
+				setText(e.getTitle().substring(0, 15)
+						+ e.getDescription().substring(0, 15) + "  "
+						+ e.getStartTime() + "-" + e.getEndTime() + "    "
 						+ e.getStartDate().substring(0, 5));
 			} catch (Exception e) {
 				setText("Tittel                  Beskrivelse                 Tid ");

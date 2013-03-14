@@ -11,9 +11,6 @@ import java.util.Date;
 
 import com.mysql.jdbc.PreparedStatement;
 import datamodell.*;
-import datamodell.Employee;
-import datamodell.Event;
-import datamodell.EventMaker;
 
 public class Query {
 
@@ -115,6 +112,7 @@ public class Query {
 
 			int eventID = resultSet.getInt("EventID");
 			// email from parameters
+			String adminEmail = resultSet.getString("Event.Email");
 			String startTime = resultSet.getString("StartTime");
 			String endTime = resultSet.getString("EndTime");
 			String startingDate = resultSet.getString("StartDate");
@@ -126,7 +124,8 @@ public class Query {
 			String meetingOrEvent = resultSet.getString("MeetingOrEvent");
 			int roomNr = resultSet.getInt("RoomNR");
 
-			daysEventList.add(new Event(eventID, email, startingDate, endDate,
+			
+			daysEventList.add(new Event(eventID, adminEmail, startingDate, endDate,
 					startTime, endTime, place, description, title,
 					employeeList, EventTypes.appointment));
 		}
@@ -156,6 +155,7 @@ public class Query {
 
 			int eventID = resultSet.getInt("EventID");
 			// email from parameters
+			String adminEmail = resultSet.getString("Event.Email");
 			String startTime = resultSet.getString("StartTime");
 			String endTime = resultSet.getString("EndTime");
 			String startDate = resultSet.getString("StartDate");
@@ -168,7 +168,7 @@ public class Query {
 			int roomNr = resultSet.getInt("RoomNR");
 			int weekNR = resultSet.getInt("weekNR");
 
-			weekEventList.add(new Event(eventID, email, startDate, endDate,
+			weekEventList.add(new Event(eventID, adminEmail, startDate, endDate,
 					startTime, endTime, place, description, title,
 					employeeList, EventTypes.appointment));
 		}
@@ -177,5 +177,16 @@ public class Query {
 		
 		return weekEventList;
 	}
+	
+	public void deleteEvent(int eventid, String email) throws SQLException{
+		
+		PreparedStatement preparedStatement = (PreparedStatement) conn.connection.prepareStatement("DELETE FROM Event WHERE EventID = ? AND Email=?");
+		
+		preparedStatement.setInt(1,eventid);
+		preparedStatement.setString(2, email);
+		
+		preparedStatement.execute();
+	}
 
+	
 }

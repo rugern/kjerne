@@ -111,11 +111,14 @@ public class AddingEventGUI extends JPanel {
 		JTextField descriptionTextField = new JTextField(20);
 		descriptionTextField.setPreferredSize(new Dimension(50, 16));
 
-		JDateChooser dateChooser = new JDateChooser();
-		dateChooser.setPreferredSize(new Dimension(100, 16));
+		JDateChooser startDateChooser = new JDateChooser();
+		startDateChooser.setPreferredSize(new Dimension(100, 16));
+		
+		JDateChooser endDateChooser = new JDateChooser();
+		endDateChooser.setPreferredSize(new Dimension(100, 16));
 
-		JLabel widerLabel = new JLabel(
-				"                                       ");
+		JLabel toLabel = new JLabel(
+				" til");
 		JLabel widerLabel2 = new JLabel(
 				"                                            ");
 		JLabel widerLabel3 = new JLabel(
@@ -159,8 +162,9 @@ public class AddingEventGUI extends JPanel {
 
 		eastUpperPanel.add(titleTextField);
 		eastUpperPanel.add(descriptionTextField);
-		eastUpperPanel.add(dateChooser);
-		eastUpperPanel.add(widerLabel);
+		eastUpperPanel.add(startDateChooser);
+		eastUpperPanel.add(toLabel);
+		eastUpperPanel.add(endDateChooser);
 		eastUpperPanel.add(startTimeHourSpin);
 		eastUpperPanel.add(startTimeMinuteSpin);
 		eastUpperPanel.add(widerLabel2);

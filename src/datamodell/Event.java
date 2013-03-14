@@ -32,6 +32,7 @@ public class Event {
 	//Constructor
 	public Event(int ID, String adminEmail, String startDate, String endDate, String startTime, String endTime,String locale, String description, String title, ArrayList<EventMaker> participants,
 			EventTypes eventTypes) {
+		this.ID = ID;
 		this.adminEmail = adminEmail;
 		this.startDate = startDate;
 		this.endDate = endDate;
