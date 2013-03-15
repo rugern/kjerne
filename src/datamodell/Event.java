@@ -1,5 +1,6 @@
 package datamodell;
 
+import GUI.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,15 +59,12 @@ public class Event {
 		this.endTime = endTime; 
 		this.description = description;
 		this.title = title;
-		try {
-			this.weekNr = dateToStringModifier.getWeeksNumber(dateToStringModifier.getCompleteDate(addingEventGUI.startDateChooser.getDate(), addingEventGUI.startDateChooser.getDate().getYear()));
-		} catch (Exception e) {
-		}
+	
 		this.participants = participants;
 		this.setEventTypes(eventTypes);
 		try {
 			System.out.println("adder ny");
-			new database.Query().addEvent(title, adminEmail, ID, startTime, endTime, startDate, endDate, description, place, eventTypes,  roomNr, weekNr);
+			new database.Query().addEventToDatabase(title, adminEmail, ID, startTime, endTime, startDate, endDate, description, place, eventTypes,  roomNr);
 		} catch (SQLException e) {
 		}
 		
@@ -85,15 +83,12 @@ public class Event {
 		this.endTime = endTime; 
 		this.description = description;
 		this.title = title;
-		try {
-			this.weekNr = dateToStringModifier.getWeeksNumber(dateToStringModifier.getCompleteDate(addingEventGUI.startDateChooser.getDate(), addingEventGUI.startDateChooser.getDate().getYear()));
-		} catch (Exception e) {
-		}
 		this.participants = participants;
 		this.setEventTypes(eventTypes);
 		try {
-			new database.Query().addEvent(title, adminEmail, ID, startTime, endTime, startDate, endDate, description, place, eventTypes,  roomNr, weekNr);
+			new database.Query().addEventToDatabase(title, adminEmail, ID, startTime, endTime, startDate, endDate, description, place, eventTypes,  roomNr);
 		} catch (SQLException e) {
+			System.out.println(e.getMessage());
 		}
 		
 		//socket.createEventQuery(adminEmail, startDate, endDate, locale, description, title, participants, eventTypes);

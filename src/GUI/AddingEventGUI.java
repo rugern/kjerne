@@ -1,12 +1,18 @@
 package GUI;
 
-
+import datamodell.Locale;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -17,9 +23,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
 
 import com.toedter.calendar.JDateChooser;
+
+import database.Query;
+import datamodell.Locale;
 
 public class AddingEventGUI extends JPanel {
 
@@ -42,11 +52,24 @@ public class AddingEventGUI extends JPanel {
 
 	JButton completeNewEventButton = new JButton("Fullfør");
 	JButton cancelNewEventButton = new JButton("Avbryt");
+	
+	
+	//Needed components
 	JTextField titleTextField;
 	JComboBox eventTypeSelecter;
 	JButton addParticipant;
 	JButton removeParticipant;
-	public JDateChooser startDateChooser;
+	public JDateChooser startDateChooser = new JDateChooser();
+	public JDateChooser endDateChooser = new JDateChooser();
+	JSpinner startTimeMinuteSpin;
+	JSpinner startTimeHourSpin;
+	JSpinner endTimeHourSpin;
+	JSpinner endTimeMinuteSpin;
+	JComboBox roomSelecter;
+	JTextField placeField;
+	JTextField descriptionTextField;
+	JList chosenParticipants;
+	JList potensialParticipants;
 
 	public AddingEventGUI() {
 
@@ -107,15 +130,17 @@ public class AddingEventGUI extends JPanel {
 		eastUpperPanel.setPreferredSize(new Dimension(250, 150));
 
 		titleTextField = new JTextField(20);
+		titleTextField.setName("TitleTextField");
 		titleTextField.setPreferredSize(new Dimension(50, 16));
 		
-		JTextField descriptionTextField = new JTextField(20);
+		descriptionTextField = new JTextField(20);
+		descriptionTextField.setName("descriptionTextField");
 		descriptionTextField.setPreferredSize(new Dimension(50, 16));
 
-		startDateChooser = new JDateChooser();
+		startDateChooser.setName("startDateChooser");
 		startDateChooser.setPreferredSize(new Dimension(100, 16));
 		
-		JDateChooser endDateChooser = new JDateChooser();
+		endDateChooser.setName("endDateChooser");
 		endDateChooser.setPreferredSize(new Dimension(100, 16));
 
 		JLabel toLabel = new JLabel(
@@ -127,34 +152,48 @@ public class AddingEventGUI extends JPanel {
 		JLabel widerLabel4 = new JLabel(
 				"                                       ");
 
-		JSpinner startTimeMinuteSpin = new JSpinner(new SpinnerNumberModel(0,
+		startTimeMinuteSpin = new JSpinner(new SpinnerNumberModel(0,
 				0, 59, 1));
 		JComponent startTimeMinuteField = ((JSpinner.DefaultEditor) ((JSpinner) startTimeMinuteSpin)
 				.getEditor());
 		startTimeMinuteField.setPreferredSize(new Dimension(20, 12));
 
-		JSpinner startTimeHourSpin = new JSpinner(new SpinnerNumberModel(10, 0,
+		startTimeHourSpin = new JSpinner(new SpinnerNumberModel(10, 0,
 				23, 1));
 		JComponent startTimeHourField = ((JSpinner.DefaultEditor) ((JSpinner) startTimeHourSpin)
 				.getEditor());
 		startTimeHourField.setPreferredSize(new Dimension(20, 12));
 
-		JSpinner endTimeHourSpin = new JSpinner(new SpinnerNumberModel(10, 0,
+		endTimeHourSpin = new JSpinner(new SpinnerNumberModel(10, 0,
 				23, 1));
 		JComponent endTimeHourField = ((JSpinner.DefaultEditor) ((JSpinner) endTimeHourSpin)
 				.getEditor());
 		endTimeHourField.setPreferredSize(new Dimension(20, 12));
 
-		JSpinner endTimeMinuteSpin = new JSpinner(new SpinnerNumberModel(0, 0,
+		endTimeMinuteSpin = new JSpinner(new SpinnerNumberModel(0, 0,
 				59, 1));
 		JComponent endtimeMinuteField = ((JSpinner.DefaultEditor) ((JSpinner) endTimeMinuteSpin)
 				.getEditor());
 		endtimeMinuteField.setPreferredSize(new Dimension(20, 12));
 
-		JComboBox roomSelecter = new JComboBox(Room.values());
-		roomSelecter.setPreferredSize(new Dimension(70, 16));
+		try {
+			
+			DefaultComboBoxModel roomModel = new DefaultComboBoxModel();
+			
+			ArrayList<Locale> localList = new Query().getLocale();
+			
+			for (int i = 0; i < localList.size(); i++) {
+				roomModel.addElement(localList.get(i));
+			}
+			roomSelecter = new JComboBox(roomModel);
+			roomSelecter.setRenderer(new roomRenderer());
+			roomSelecter.setPreferredSize(new Dimension(80, 16));
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		
-		JTextField placeField = new JTextField(13);
+		placeField = new JTextField(12);
 		placeField.setPreferredSize(new Dimension(50, 16));
 
 		eventTypeSelecter = new JComboBox(EventTypes.values());
@@ -182,7 +221,7 @@ public class AddingEventGUI extends JPanel {
 		leftEastCentePanel.setBackground(Color.WHITE);
 		leftEastCentePanel.setPreferredSize(new Dimension(110, 140));
 
-		JList chosenParticipants = new JList();
+		chosenParticipants = new JList();
 		chosenParticipants.setFixedCellWidth(100);
 		chosenParticipants.setFixedCellHeight(30);
 		
@@ -214,7 +253,7 @@ public class AddingEventGUI extends JPanel {
 		rightEastCenterPanel.setPreferredSize(new Dimension(110, 140));
 		rightEastCenterPanel.setBackground(Color.WHITE);
 
-		JList potensialParticipants = new JList();
+		potensialParticipants = new JList();
 		potensialParticipants.setFixedCellWidth(100);
 		potensialParticipants.setFixedCellHeight(30);
 		
@@ -282,6 +321,22 @@ public class AddingEventGUI extends JPanel {
 
 		add(mainPanel);
 
+	}
+	
+	public class roomRenderer extends JLabel implements ListCellRenderer{
+
+		@Override
+		public Component getListCellRendererComponent(JList arg0, Object arg1,
+				int arg2, boolean arg3, boolean arg4) {
+
+			Locale locale = (Locale) arg1;
+			
+			
+			setText(String.valueOf(locale.getID()) + "  Cap: " + String.valueOf(locale.getCapcity()));
+			
+			return this;
+		}
+		
 	}
 	
 	public class selecetedEventType implements ActionListener{

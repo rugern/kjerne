@@ -37,12 +37,12 @@ public class Conn {
 
 	public static void main(String args[]) throws SQLException {
 
-		Query query = new Query();
+//		Query query = new Query();
 
 //		query.addEvent("test", "testing@gmail.com", null, null,
 //				null, "hydro", null, (Integer) null);
 		
-		System.out.println("entered");
+//		System.out.println("entered");
 
 //		query.getEventByDate("@gmail.com", "2013mar01");
 

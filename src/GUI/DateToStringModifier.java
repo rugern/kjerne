@@ -53,8 +53,7 @@ public class DateToStringModifier {
 			cal.setTime(date);
 			week = cal.get(Calendar.WEEK_OF_YEAR);
 		}catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Parseerror");
 		}
 
 		return week;

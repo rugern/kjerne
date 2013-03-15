@@ -20,16 +20,23 @@ import client.SocketClient;
 public abstract class EventMaker {
 	
 	private String email;
+	private String name;
 	private boolean[][] calendar;
 	private List<Event> events; //list of events this user is connected to
 	private List<Event> invitations; //TODO ensure accept and decline is handled
 	private List<String> deletes; //A quick toString of an event right before deletion ensures that the user knows what has been deleted, once user is notified, delete the string from this list as well.
 //	private SocketClient socket = new SocketClient(server, port); //TODO
 	
-	public EventMaker(String email) {
+	public EventMaker(String email, String name) {
 		this.setEmail(email);
+		this.setName(name);
+	
 	}
 	
+	
+	public void setName(String name){
+		this.name = name;
+	}
 	/**
 	 * @deprecated Server must handle login, obviously EventMaker has access
 	 * to itself therefore authentication must happen outside of this class.
@@ -49,13 +56,13 @@ public abstract class EventMaker {
 	 * @parameter Event fields
 	 * @return the created Event object
 	 */
-	public Event createEvent(int ID, String title, String description, String startDate, 
-			String endDate, String startTime, String endTime, String locale, EventTypes type, ArrayList<EventMaker> participants, 
-			Boolean lydVarsling, Boolean tekstVarsling) {
-		
-		Event event = new Event(0, email, startDate, endDate, startTime, endTime, locale, description, title,  participants, type);
-		return event;
-	}
+//	public Event createEvent(int ID, String title, String description, String startDate, 
+//			String endDate, String startTime, String endTime, String locale, EventTypes type, ArrayList<EventMaker> participants, 
+//			Boolean lydVarsling, Boolean tekstVarsling) {
+//		
+//		Event event = new Event(0, email, startDate, endDate, startTime, endTime, locale, description, title,  participants, type);
+//		return event;
+//	}
 	
 	/**
 	 * This EventMaker has been invited to an event, add to list of invitations 

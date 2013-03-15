@@ -5,12 +5,12 @@ package datamodell;
 
 public class Employee extends EventMaker {
 	
-	public Employee(String email) {
-		super(email);
+	public Employee(String email, String name) {
+		super(email, name);
 	}
-
-	private int ssn;
 	
+	private int ssn;
+
 	public int getID()
 	{
 		return ssn;

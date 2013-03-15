@@ -1,5 +1,7 @@
 package GUI;
 
+import datamodell.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -97,11 +99,6 @@ public class MainProfileGUI extends JPanel {
 		cal.setDecorationBackgroundColor(Color.WHITE);
 
 		DefaultListModel testModel = new DefaultListModel();
-		testModel.addElement(new TestingObject());
-		testModel.addElement(new TestingObject());
-		testModel.addElement(new TestingObject());
-		testModel.addElement(new TestingObject());
-		testModel.addElement(new TestingObject());
 
 		// WestNorthLowerPanel
 		JButton addEventButton = new JButton("Ny hendelse");
@@ -231,9 +228,9 @@ public class MainProfileGUI extends JPanel {
 		westSouthPanel.setPreferredSize(new Dimension(300, 300));
 		westSouthPanel.setBackground(new Color(0xe35e6e));
 
-		JLabel todaysEvents = new JLabel(
+		JLabel weekEvents = new JLabel(
 				"             Ukens avtaler             ");
-		westSouthPanel.add(todaysEvents);
+		westSouthPanel.add(weekEvents);
 		westSouthPanel.add(westSouthLowerPanel, BorderLayout.SOUTH);
 
 		// EastNorthPanel
@@ -394,11 +391,57 @@ public class MainProfileGUI extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-//			Event event = new Event(adminEmail, startDate, endDate, startTime, endTime, place, description, title, participants, eventTypes, roomNr)
-			
-			JOptionPane.showMessageDialog(null,
-					"Eventen ble lagt til i din kalender");
-			addingFrame.setVisible(false);
+			// Event event = new Event(adminEmail, startDate, endDate,
+			// startTime, endTime, place, description, title, participants,
+			// eventTypes, roomNr)
+
+			try {
+				DateToStringModifier dtsm = new DateToStringModifier();
+
+				String startDate = dtsm.getCompleteDate(
+						addingEventGUI.startDateChooser.getDate(),
+						addingEventGUI.startDateChooser.getDate().getYear());
+				String endDate = dtsm.getCompleteDate(
+						addingEventGUI.endDateChooser.getDate(),
+						addingEventGUI.endDateChooser.getDate().getYear());
+
+				String startTime = String
+						.valueOf(addingEventGUI.startTimeHourSpin.getValue())
+						+ ":"
+						+ String.valueOf(addingEventGUI.startTimeMinuteSpin
+								.getValue());
+				String endTime = String.valueOf(addingEventGUI.endTimeHourSpin
+						.getValue())
+						+ ":"
+						+ String.valueOf(addingEventGUI.endTimeMinuteSpin
+								.getValue());
+
+				String place = addingEventGUI.placeField.getText();
+				String description = addingEventGUI.descriptionTextField
+						.getText();
+				String title = addingEventGUI.titleTextField.getText();
+
+				ArrayList<EventMaker> participants = new ArrayList<EventMaker>();
+
+				EventTypes eventTypes = (EventTypes) addingEventGUI.eventTypeSelecter
+						.getSelectedItem();
+
+				// Need to be altered
+				int roomNr = 8;
+
+				Event event = new Event("@gmail.com", startDate, endDate,
+						startTime, endTime, place, description, title,
+						participants, eventTypes, roomNr);
+
+
+				JOptionPane.showMessageDialog(null,
+						"Eventen ble lagt til i din kalender");
+				addingFrame.setVisible(false);
+
+			} catch (Exception e2) {
+				JOptionPane.showMessageDialog(null,
+						"Du må fylle ut start - og sluttdato");
+			}
 		}
 	}
 
@@ -406,36 +449,66 @@ public class MainProfileGUI extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			Event event = (Event) chosenDayEventList.getSelectedValue();
-			
-			if (event.getAdminEmail().equals("@gmail.com")) {
-				if (JOptionPane
-						.showConfirmDialog(null,
+			try {
+				Event event = (Event) chosenDayEventList.getSelectedValue();
+				try {
+
+					if (event.getAdminEmail().equals("@gmail.com")) {
+						if (JOptionPane.showConfirmDialog(null,
 								"Vil du slette " + event.getTitle() + " ?",
 								"Slette event?", JOptionPane.YES_NO_OPTION,
 								JOptionPane.QUESTION_MESSAGE) == 0) {
-					try {
-						System.out.println(event.getID() + " = ID");
-						((Query) new Query()).deleteEvent(event.getID(),
-								"@gmail.com");
-						todaysEventsList = new Query().getEventByDate(
-								"@gmail.com", cal.getDate(), cal.getDate()
-										.getYear());
-						todaysEventModel.clear();
-						for (int i = 0; i < todaysEventsList.size(); i++) {
-							todaysEventModel
-									.addElement(todaysEventsList.get(i));
-						}
+							try {
+								((Query) new Query()).deleteEvent(
+										event.getID(), "@gmail.com");
+								todaysEventsList = new Query().getEventByDate(
+										"@gmail.com", cal.getDate(), cal
+												.getDate().getYear());
+								todaysEventModel.clear();
+								todaysEventModel.addElement(new String());
+								for (int i = 0; i < todaysEventsList.size(); i++) {
+									todaysEventModel
+											.addElement(todaysEventsList.get(i));
+								}
 
-					} catch (SQLException e1) {
-						System.out.println("Error on delete: ");
+								ArrayList<Event> weekEvents;
+								try {
+									weekEvents = new Query()
+											.getThisWeeksEvents("@gmail.com",
+													cal.getDate(), cal
+															.getDate()
+															.getYear());
+									weekModel = new DefaultListModel();
+									weekModel.clear();
+									weekModel.addElement(new String());
+
+									for (int i = 0; i < weekEvents.size(); i++) {
+										weekModel.addElement(weekEvents.get(i));
+									}
+								} catch (ParseException e1) {
+									System.out.println("doesnt update after delete");
+								}
+
+							} catch (SQLException e1) {
+								System.out.println("Error on delete: ");
+							}
+						}
+					} else {
+						JOptionPane
+								.showMessageDialog(null,
+										"Du kan ikke slette eventen da du ikke opprettet den");
 					}
+
+				} catch (NullPointerException e2) {
+					JOptionPane.showMessageDialog(null, "Du må velge en event");
 				}
+
+			} catch (ClassCastException e2) {
+				JOptionPane.showMessageDialog(null,
+						"DU kan ikke slette headeren!");
 			}
-		else{
-			JOptionPane.showMessageDialog(null, "Du kan ikke slette eventen da du ikke opprettet den");
 		}
-	}}
+	}
 
 	public class viewEmployeeCalender implements ActionListener {
 
