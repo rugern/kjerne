@@ -393,6 +393,9 @@ public class MainProfileGUI extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+
+//			Event event = new Event(adminEmail, startDate, endDate, startTime, endTime, place, description, title, participants, eventTypes, roomNr)
+			
 			JOptionPane.showMessageDialog(null,
 					"Eventen ble lagt til i din kalender");
 			addingFrame.setVisible(false);

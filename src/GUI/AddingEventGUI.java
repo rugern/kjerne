@@ -46,6 +46,7 @@ public class AddingEventGUI extends JPanel {
 	JComboBox eventTypeSelecter;
 	JButton addParticipant;
 	JButton removeParticipant;
+	public JDateChooser startDateChooser;
 
 	public AddingEventGUI() {
 
@@ -111,7 +112,7 @@ public class AddingEventGUI extends JPanel {
 		JTextField descriptionTextField = new JTextField(20);
 		descriptionTextField.setPreferredSize(new Dimension(50, 16));
 
-		JDateChooser startDateChooser = new JDateChooser();
+		startDateChooser = new JDateChooser();
 		startDateChooser.setPreferredSize(new Dimension(100, 16));
 		
 		JDateChooser endDateChooser = new JDateChooser();
