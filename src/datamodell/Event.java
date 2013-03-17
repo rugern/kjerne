@@ -48,7 +48,7 @@ public class Event {
 
 	// Constructor
 	public Event(int ID, String adminEmail, String startDate, String endDate, String startTime, String endTime,String place, String description, String title, ArrayList<EventMaker> participants,
-			EventTypes eventTypes, int roomNr) {
+			EventTypes eventTypes, int roomNr, int weekNR) {
 		this.ID = ID;
 		this.adminEmail = adminEmail;
 		this.startDate = startDate;
@@ -59,12 +59,11 @@ public class Event {
 		this.endTime = endTime; 
 		this.description = description;
 		this.title = title;
-	
+		this.weekNr = weekNR;
 		this.participants = participants;
 		this.setEventTypes(eventTypes);
 		try {
-			System.out.println("adder ny");
-			new database.Query().addEventToDatabase(title, adminEmail, ID, startTime, endTime, startDate, endDate, description, place, eventTypes,  roomNr);
+			new database.Query().addEventToDatabase(title, adminEmail, ID, startTime, endTime, startDate, endDate, description, place, eventTypes,  roomNr, weekNR);
 		} catch (SQLException e) {
 		}
 		
@@ -73,7 +72,7 @@ public class Event {
 	
 	//Constructor without setting EventID - has to be set by the database
 	public Event(String adminEmail, String startDate, String endDate, String startTime, String endTime,String place, String description, String title, ArrayList<EventMaker> participants,
-			EventTypes eventTypes, int roomNr) {
+			EventTypes eventTypes, int roomNr, int weekNR) {
 		this.adminEmail = adminEmail;
 		this.startDate = startDate;
 		this.endDate = endDate;
@@ -83,10 +82,11 @@ public class Event {
 		this.endTime = endTime; 
 		this.description = description;
 		this.title = title;
+		this.weekNr = weekNR;
 		this.participants = participants;
 		this.setEventTypes(eventTypes);
 		try {
-			new database.Query().addEventToDatabase(title, adminEmail, ID, startTime, endTime, startDate, endDate, description, place, eventTypes,  roomNr);
+			new database.Query().addEventToDatabase(title, adminEmail, ID, startTime, endTime, startDate, endDate, description, place, eventTypes,  roomNr, weekNR);
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}

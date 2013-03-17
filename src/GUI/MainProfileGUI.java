@@ -78,6 +78,10 @@ public class MainProfileGUI extends JPanel {
 	DefaultListModel todaysEventModel;
 
 	ArrayList<Event> todaysEventsList;
+	ArrayList<Event> weekEvents;
+	
+	Date thisDate;
+	int thisYear;
 
 	public static void main(String[] args) {
 		JFrame profileFrame = new JFrame("Min Profil");
@@ -97,6 +101,9 @@ public class MainProfileGUI extends JPanel {
 		cal = new JCalendar();
 		cal.setPreferredSize(new Dimension(300, 280));
 		cal.setDecorationBackgroundColor(Color.WHITE);
+		
+		thisDate = cal.getDate();
+		thisYear = cal.getDate().getYear();
 
 		DefaultListModel testModel = new DefaultListModel();
 
@@ -391,12 +398,8 @@ public class MainProfileGUI extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			// Event event = new Event(adminEmail, startDate, endDate,
-			// startTime, endTime, place, description, title, participants,
-			// eventTypes, roomNr)
-
 			try {
-				DateToStringModifier dtsm = new DateToStringModifier();
+				dtsm = new DateToStringModifier();
 
 				String startDate = dtsm.getCompleteDate(
 						addingEventGUI.startDateChooser.getDate(),
@@ -422,23 +425,59 @@ public class MainProfileGUI extends JPanel {
 				String title = addingEventGUI.titleTextField.getText();
 
 				ArrayList<EventMaker> participants = new ArrayList<EventMaker>();
+				
+				for (int i = 0; i < addingEventGUI.chosenEmployeesModel.getSize(); i++) {
+					participants.add((EventMaker) addingEventGUI.chosenEmployeesModel.get(i));
+					System.out.println(addingEventGUI.chosenEmployeesModel.get(i));
+				}
+				
 
 				EventTypes eventTypes = (EventTypes) addingEventGUI.eventTypeSelecter
 						.getSelectedItem();
 
 				// Need to be altered
 				int roomNr = 8;
+				// (Integer) addingEventGUI.roomSelecter.getSelectedItem();
+
+				int weekNr = dtsm.getWeeksNumber(dtsm.getCompleteDate(
+						addingEventGUI.startDateChooser.getDate(),
+						addingEventGUI.endDateChooser.getDate().getYear()));
 
 				Event event = new Event("@gmail.com", startDate, endDate,
 						startTime, endTime, place, description, title,
-						participants, eventTypes, roomNr);
-
+						participants, eventTypes, roomNr, weekNr);
 
 				JOptionPane.showMessageDialog(null,
 						"Eventen ble lagt til i din kalender");
 				addingFrame.setVisible(false);
 
-			} catch (Exception e2) {
+				todaysEventModel.clear();
+				
+				todaysEventsList = new Query().getEventByDate("@gmail.com",
+						cal.getDate(), cal.getDate().getYear());
+				todaysEventModel.addElement(new String());
+
+				for (int i = 0; i < todaysEventsList.size(); i++) {
+					todaysEventModel.addElement(todaysEventsList.get(i));
+				}
+
+				weekModel.clear();
+				
+				weekEvents = new Query().getThisWeeksEvents("@gmail.com",
+						thisDate, thisYear);
+				weekModel.addElement(new String());
+
+				for (int j = 0; j < weekEvents.size(); j++) {
+					weekModel.addElement(weekEvents.get(j));
+
+				}
+
+			} catch (ParseException e2) {
+				System.out.println("klarer ikke regne ut weeknr   "
+						+ e2.getMessage());
+			}
+
+			catch (Exception e2) {
 				JOptionPane.showMessageDialog(null,
 						"Du må fylle ut start - og sluttdato");
 			}
@@ -449,64 +488,59 @@ public class MainProfileGUI extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
+
 			try {
 				Event event = (Event) chosenDayEventList.getSelectedValue();
-				try {
 
-					if (event.getAdminEmail().equals("@gmail.com")) {
-						if (JOptionPane.showConfirmDialog(null,
-								"Vil du slette " + event.getTitle() + " ?",
-								"Slette event?", JOptionPane.YES_NO_OPTION,
-								JOptionPane.QUESTION_MESSAGE) == 0) {
-							try {
-								((Query) new Query()).deleteEvent(
-										event.getID(), "@gmail.com");
-								todaysEventsList = new Query().getEventByDate(
-										"@gmail.com", cal.getDate(), cal
-												.getDate().getYear());
-								todaysEventModel.clear();
-								todaysEventModel.addElement(new String());
-								for (int i = 0; i < todaysEventsList.size(); i++) {
-									todaysEventModel
-											.addElement(todaysEventsList.get(i));
-								}
+				if (event.getAdminEmail().equals("@gmail.com")) {
+					if (JOptionPane.showConfirmDialog(null, "Vil du slette "
+							+ event.getTitle() + " ?", "Slette event?",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.QUESTION_MESSAGE) == 0) {
 
-								ArrayList<Event> weekEvents;
-								try {
-									weekEvents = new Query()
-											.getThisWeeksEvents("@gmail.com",
-													cal.getDate(), cal
-															.getDate()
-															.getYear());
-									weekModel = new DefaultListModel();
-									weekModel.clear();
-									weekModel.addElement(new String());
+						((Query) new Query()).deleteEvent(event.getID(),
+								"@gmail.com");
 
-									for (int i = 0; i < weekEvents.size(); i++) {
-										weekModel.addElement(weekEvents.get(i));
-									}
-								} catch (ParseException e1) {
-									System.out.println("doesnt update after delete");
-								}
+						todaysEventModel.clear();
 
-							} catch (SQLException e1) {
-								System.out.println("Error on delete: ");
-							}
+						todaysEventsList = new Query().getEventByDate(
+								"@gmail.com", cal.getDate(), cal.getDate()
+										.getYear());
+						todaysEventModel.addElement(new String());
+
+						for (int i = 0; i < todaysEventsList.size(); i++) {
+							todaysEventModel
+									.addElement(todaysEventsList.get(i));
 						}
-					} else {
-						JOptionPane
-								.showMessageDialog(null,
-										"Du kan ikke slette eventen da du ikke opprettet den");
+
+						weekModel.clear();
+
+						weekEvents = new Query().getThisWeeksEvents(
+								"@gmail.com", thisDate, thisYear);
+						
+						weekModel.addElement(new String());
+
+						for (int j = 0; j < weekEvents.size(); j++) {
+							weekModel.addElement(weekEvents.get(j));
+						}
+
 					}
-
-				} catch (NullPointerException e2) {
-					JOptionPane.showMessageDialog(null, "Du må velge en event");
+				} else {
+					JOptionPane
+							.showMessageDialog(null,
+									"Du kan ikke slette eventen da du ikke opprettet den");
 				}
-
-			} catch (ClassCastException e2) {
+			} catch (SQLException e1) {
+				System.out.println("Error on delete: ");
+			} catch (NullPointerException e2) {
+				JOptionPane.showMessageDialog(null, "Du må velge en event");
+			} catch (ClassCastException e3) {
 				JOptionPane.showMessageDialog(null,
 						"DU kan ikke slette headeren!");
+			} catch (ParseException e4) {
+				System.out.println("Parseerror");
 			}
+
 		}
 	}
 

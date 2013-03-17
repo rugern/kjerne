@@ -37,6 +37,10 @@ public abstract class EventMaker {
 	public void setName(String name){
 		this.name = name;
 	}
+	
+	public String getName(){
+		return this.name;
+	}
 	/**
 	 * @deprecated Server must handle login, obviously EventMaker has access
 	 * to itself therefore authentication must happen outside of this class.

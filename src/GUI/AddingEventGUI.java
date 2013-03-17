@@ -1,5 +1,7 @@
 package GUI;
 
+import datamodell.Employee;
+import datamodell.EventMaker;
 import datamodell.Locale;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -7,6 +9,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -52,9 +56,8 @@ public class AddingEventGUI extends JPanel {
 
 	JButton completeNewEventButton = new JButton("Fullfør");
 	JButton cancelNewEventButton = new JButton("Avbryt");
-	
-	
-	//Needed components
+
+	// Needed components
 	JTextField titleTextField;
 	JComboBox eventTypeSelecter;
 	JButton addParticipant;
@@ -70,6 +73,9 @@ public class AddingEventGUI extends JPanel {
 	JTextField descriptionTextField;
 	JList chosenParticipants;
 	JList potensialParticipants;
+
+	DefaultListModel potensialEmployeesModel;
+	DefaultListModel chosenEmployeesModel;
 
 	public AddingEventGUI() {
 
@@ -103,7 +109,7 @@ public class AddingEventGUI extends JPanel {
 		westCenterPanel.setBackground(Color.WHITE);
 
 		JLabel particantLabel = new JLabel("Deltagere");
-		
+
 		westCenterPanel.add(particantLabel);
 
 		// WestLowerPanel
@@ -112,14 +118,14 @@ public class AddingEventGUI extends JPanel {
 		westLowerPanel.setPreferredSize(new Dimension(70, 25));
 
 		JLabel alarmLabel = new JLabel("Varsling");
-		
+
 		westLowerPanel.add(alarmLabel);
 
 		// MainWestPanel
 		mainWestPanel = new JPanel();
 		mainWestPanel.setPreferredSize(new Dimension(80, 350));
 		mainWestPanel.setBackground(Color.WHITE);
-		
+
 		mainWestPanel.add(westUpperPanel, BorderLayout.NORTH);
 		mainWestPanel.add(westCenterPanel, BorderLayout.CENTER);
 		mainWestPanel.add(westLowerPanel, BorderLayout.SOUTH);
@@ -132,19 +138,18 @@ public class AddingEventGUI extends JPanel {
 		titleTextField = new JTextField(20);
 		titleTextField.setName("TitleTextField");
 		titleTextField.setPreferredSize(new Dimension(50, 16));
-		
+
 		descriptionTextField = new JTextField(20);
 		descriptionTextField.setName("descriptionTextField");
 		descriptionTextField.setPreferredSize(new Dimension(50, 16));
 
 		startDateChooser.setName("startDateChooser");
 		startDateChooser.setPreferredSize(new Dimension(100, 16));
-		
+
 		endDateChooser.setName("endDateChooser");
 		endDateChooser.setPreferredSize(new Dimension(100, 16));
 
-		JLabel toLabel = new JLabel(
-				" til");
+		JLabel toLabel = new JLabel(" til");
 		JLabel widerLabel2 = new JLabel(
 				"                                            ");
 		JLabel widerLabel3 = new JLabel(
@@ -152,36 +157,32 @@ public class AddingEventGUI extends JPanel {
 		JLabel widerLabel4 = new JLabel(
 				"                                       ");
 
-		startTimeMinuteSpin = new JSpinner(new SpinnerNumberModel(0,
-				0, 59, 1));
+		startTimeMinuteSpin = new JSpinner(new SpinnerNumberModel(0, 0, 59, 1));
 		JComponent startTimeMinuteField = ((JSpinner.DefaultEditor) ((JSpinner) startTimeMinuteSpin)
 				.getEditor());
 		startTimeMinuteField.setPreferredSize(new Dimension(20, 12));
 
-		startTimeHourSpin = new JSpinner(new SpinnerNumberModel(10, 0,
-				23, 1));
+		startTimeHourSpin = new JSpinner(new SpinnerNumberModel(10, 0, 23, 1));
 		JComponent startTimeHourField = ((JSpinner.DefaultEditor) ((JSpinner) startTimeHourSpin)
 				.getEditor());
 		startTimeHourField.setPreferredSize(new Dimension(20, 12));
 
-		endTimeHourSpin = new JSpinner(new SpinnerNumberModel(10, 0,
-				23, 1));
+		endTimeHourSpin = new JSpinner(new SpinnerNumberModel(10, 0, 23, 1));
 		JComponent endTimeHourField = ((JSpinner.DefaultEditor) ((JSpinner) endTimeHourSpin)
 				.getEditor());
 		endTimeHourField.setPreferredSize(new Dimension(20, 12));
 
-		endTimeMinuteSpin = new JSpinner(new SpinnerNumberModel(0, 0,
-				59, 1));
+		endTimeMinuteSpin = new JSpinner(new SpinnerNumberModel(0, 0, 59, 1));
 		JComponent endtimeMinuteField = ((JSpinner.DefaultEditor) ((JSpinner) endTimeMinuteSpin)
 				.getEditor());
 		endtimeMinuteField.setPreferredSize(new Dimension(20, 12));
 
 		try {
-			
+
 			DefaultComboBoxModel roomModel = new DefaultComboBoxModel();
-			
+
 			ArrayList<Locale> localList = new Query().getLocale();
-			
+
 			for (int i = 0; i < localList.size(); i++) {
 				roomModel.addElement(localList.get(i));
 			}
@@ -192,7 +193,7 @@ public class AddingEventGUI extends JPanel {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		placeField = new JTextField(12);
 		placeField.setPreferredSize(new Dimension(50, 16));
 
@@ -221,10 +222,13 @@ public class AddingEventGUI extends JPanel {
 		leftEastCentePanel.setBackground(Color.WHITE);
 		leftEastCentePanel.setPreferredSize(new Dimension(110, 140));
 
-		chosenParticipants = new JList();
+		chosenEmployeesModel = new DefaultListModel();
+
+		chosenParticipants = new JList(chosenEmployeesModel);
+		chosenParticipants.setCellRenderer(new EmployeeRenderer());
 		chosenParticipants.setFixedCellWidth(100);
 		chosenParticipants.setFixedCellHeight(30);
-		
+
 		JScrollPane chosenParticipantsScrollPane = new JScrollPane(
 				chosenParticipants);
 		chosenParticipantsScrollPane
@@ -240,9 +244,11 @@ public class AddingEventGUI extends JPanel {
 		centerEastCenterPanel.setBackground(Color.WHITE);
 
 		addParticipant = new JButton("<");
+		addParticipant.addActionListener(new ParticipantAdministrater());
 		addParticipant.setPreferredSize(new Dimension(45, 25));
-		
+
 		removeParticipant = new JButton(">");
+		removeParticipant.addActionListener(new ParticipantAdministrater());
 		removeParticipant.setPreferredSize(new Dimension(45, 25));
 
 		centerEastCenterPanel.add(addParticipant);
@@ -253,10 +259,23 @@ public class AddingEventGUI extends JPanel {
 		rightEastCenterPanel.setPreferredSize(new Dimension(110, 140));
 		rightEastCenterPanel.setBackground(Color.WHITE);
 
-		potensialParticipants = new JList();
+		try {
+			potensialEmployeesModel = new DefaultListModel();
+			ArrayList<Employee> employees = new Query().getEmployees();
+
+			for (int i = 0; i < employees.size(); i++) {
+				potensialEmployeesModel.addElement(employees.get(i));
+			}
+
+		} catch (SQLException e) {
+			System.out.println("SQL error on getEmployees");
+		}
+
+		potensialParticipants = new JList(potensialEmployeesModel);
+		potensialParticipants.setCellRenderer(new EmployeeRenderer());
 		potensialParticipants.setFixedCellWidth(100);
 		potensialParticipants.setFixedCellHeight(30);
-		
+
 		JScrollPane potensialParticipantsScrollPane = new JScrollPane(
 				potensialParticipants);
 		potensialParticipantsScrollPane
@@ -270,7 +289,7 @@ public class AddingEventGUI extends JPanel {
 		eastCenterPanel = new JPanel();
 		eastCenterPanel.setBackground(Color.WHITE);
 		eastCenterPanel.setPreferredSize(new Dimension(340, 155));
-		
+
 		eastCenterPanel.add(leftEastCentePanel, BorderLayout.WEST);
 		eastCenterPanel.add(centerEastCenterPanel, BorderLayout.CENTER);
 		eastCenterPanel.add(rightEastCenterPanel, BorderLayout.EAST);
@@ -283,7 +302,7 @@ public class AddingEventGUI extends JPanel {
 		JCheckBox soundAlarm = new JCheckBox("Lyd");
 		soundAlarm.setPreferredSize(new Dimension(50, 20));
 		soundAlarm.setBackground(Color.WHITE);
-		
+
 		JCheckBox textAlarm = new JCheckBox("Tekst");
 		textAlarm.setPreferredSize(new Dimension(70, 20));
 		textAlarm.setBackground(Color.WHITE);
@@ -295,7 +314,7 @@ public class AddingEventGUI extends JPanel {
 		mainEastPanel = new JPanel();
 		mainEastPanel.setBackground(Color.WHITE);
 		mainEastPanel.setPreferredSize(new Dimension(350, 350));
-		
+
 		mainEastPanel.add(eastUpperPanel, BorderLayout.NORTH);
 		mainEastPanel.add(eastCenterPanel, BorderLayout.CENTER);
 		mainEastPanel.add(eastLowerPanel, BorderLayout.SOUTH);
@@ -304,7 +323,7 @@ public class AddingEventGUI extends JPanel {
 		southPanel = new JPanel();
 		southPanel.setBackground(Color.WHITE);
 		southPanel.setPreferredSize(new Dimension(435, 40));
-		
+
 		southPanel.add(completeNewEventButton);
 		southPanel.add(cancelNewEventButton);
 
@@ -312,7 +331,7 @@ public class AddingEventGUI extends JPanel {
 		mainPanel = new JPanel();
 		mainPanel.setPreferredSize(new Dimension(400, 400));
 		mainPanel.setBackground(new Color(0xd6d5d7));
-		
+
 		mainPanel.add(mainWestPanel, BorderLayout.WEST);
 		mainPanel.add(mainEastPanel, BorderLayout.EAST);
 		mainPanel.add(southPanel, BorderLayout.SOUTH);
@@ -322,38 +341,92 @@ public class AddingEventGUI extends JPanel {
 		add(mainPanel);
 
 	}
-	
-	public class roomRenderer extends JLabel implements ListCellRenderer{
+
+	public class roomRenderer extends JLabel implements ListCellRenderer {
 
 		@Override
 		public Component getListCellRendererComponent(JList arg0, Object arg1,
 				int arg2, boolean arg3, boolean arg4) {
 
 			Locale locale = (Locale) arg1;
-			
-			
-			setText(String.valueOf(locale.getID()) + "  Cap: " + String.valueOf(locale.getCapcity()));
-			
+
+			setText(String.valueOf(locale.getID()) + "  Cap: "
+					+ String.valueOf(locale.getCapcity()));
+
 			return this;
 		}
-		
+
 	}
-	
-	public class selecetedEventType implements ActionListener{
+
+	public class ParticipantAdministrater implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if(eventTypeSelecter.getSelectedIndex() ==1){
+			if (e.getSource() == addParticipant
+					&& potensialEmployeesModel.size() > 0) {
+
+				EventMaker temp_EventMaker = (EventMaker) potensialParticipants
+						.getSelectedValue();
+				chosenEmployeesModel.addElement(temp_EventMaker);
+				potensialEmployeesModel.removeElement(temp_EventMaker);
+
+			} else if (e.getSource() == removeParticipant
+					&& chosenEmployeesModel.size() > 0) {
+
+				EventMaker temp_EventMaker = (EventMaker) chosenParticipants
+						.getSelectedValue();
+				potensialEmployeesModel.addElement(chosenParticipants
+						.getSelectedValue());
+				chosenEmployeesModel.removeElement(temp_EventMaker);
+
+			}
+
+			chosenParticipants.setSelectedIndex(0);
+			potensialParticipants.setSelectedIndex(0);
+		}
+
+	}
+
+	public class selecetedEventType implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (eventTypeSelecter.getSelectedIndex() == 1) {
 				addParticipant.setVisible(false);
 				removeParticipant.setVisible(false);
-			}else{
+			} else {
 				addParticipant.setVisible(true);
 				removeParticipant.setVisible(true);
 			}
-			
+
 		}
-		
-		
+
+	}
+
+	public class EmployeeRenderer extends JLabel implements ListCellRenderer {
+
+		@Override
+		public Component getListCellRendererComponent(JList arg0, Object arg1,
+				int arg2, boolean isSelected, boolean arg4) {
+
+			EventMaker eventmaker = (EventMaker) arg1;
+
+			try {
+				setText(eventmaker.getName());
+
+			} catch (Exception e) {
+				e.getMessage();
+			}
+
+			if (isSelected) {
+				setForeground(Color.RED);
+			} else {
+				setForeground(Color.BLACK);
+			}
+
+			return this;
+		}
+
 	}
 
 }
