@@ -152,8 +152,8 @@ public abstract class EventMaker {
 	 * Her vil GUI sannsynligvis sende EVENT som er syntaktisk valgt av 
 	 * bruker.
 	 * @return ???
-	 * @deprecated Skiten her er jo ikke nødvendig. GUI sender Event til EventMaker
-	 * det eneste EventMaker trenger å huske på er seg selv.
+	 * @deprecated Skiten her er jo ikke nÃ¸dvendig. GUI sender Event til EventMaker
+	 * det eneste EventMaker trenger Ã¥ huske pÃ¥ er seg selv.
 	 */
 	public Event getEvent() {
 		

@@ -1,18 +1,22 @@
 package database;
 
-import GUI.*;
-
-import java.lang.reflect.Array;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
+import GUI.DateToStringModifier;
+import GUI.EventTypes;
+
 import com.mysql.jdbc.PreparedStatement;
-import datamodell.*;
+
+import datamodell.Employee;
+import datamodell.Event;
+import datamodell.EventMaker;
+import datamodell.Locale;
 
 public class Query {
 
@@ -105,13 +109,19 @@ public class Query {
 			EventTypes eventtype, int roomNr, int eventID) throws SQLException {
 
 		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
-				.prepareStatement("UPDATE Event SET Title = " + title
-						+ ", Email = " + email + ", StartTime = " + startTime
-						+ ",  EndTime =" + endTime + ", Description ="
-						+ description + ", Locale = " + locale
-						+ ", MeetingOrEvent = " + eventtype + ", RoomNR = "
-						+ roomNr + "WHERE EventID = " + eventID);
-
+				.prepareStatement("UPDATE Event SET Title = ?, Email = ?, StartTime = ?,  EndTime =?, " +
+						"Description =?, Place = ?, MeetingOrEvent = ?, Roomnr = ? WHERE EventID = ?");
+		
+		preparedStatement.setString(1, title);
+		preparedStatement.setString(2, email);
+		preparedStatement.setString(3, startTime);
+		preparedStatement.setString(4, endTime);
+		preparedStatement.setString(5, description);
+		preparedStatement.setString(6, locale);
+		preparedStatement.setString(7, eventtype.toString());
+		preparedStatement.setInt(8, roomNr);
+		preparedStatement.setInt(9, eventID);
+		
 		preparedStatement.executeUpdate();
 	}
 
@@ -137,12 +147,10 @@ public class Query {
 
 	// Use own email if you want events associated with yourself, use
 	// employeeEmail if you want events associated with an employee
-	public ArrayList<Event> getEventByDate(String email, Date date, int year)
+	public ArrayList<Event> getEventByDate(String email, String startDate, int year)
 			throws SQLException {
 
 		DateToStringModifier dtsm = new DateToStringModifier();
-
-		String startDate = dtsm.getCompleteDate(date, year);
 
 		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
 				.prepareStatement("SELECT DISTINCT Event.EventID, Event.Email, StartTime, EndTime, StartDate, EndDate, Description, Place, State, Title, MeetingOrEvent, Roomnr, weekNR FROM Event JOIN Participant WHERE StartDate = ? AND (Event.Email = ? OR Participant.Email = ?) ");
@@ -169,24 +177,36 @@ public class Query {
 			String place = resultSet.getString("Place");
 			String state = resultSet.getString("State");
 			String title = resultSet.getString("Title");
-			String meetingOrEvent = resultSet.getString("MeetingOrEvent");
+			EventTypes eventType;
+			if(resultSet.getString("MeetingOrEvent") == "appointment") {
+				eventType = EventTypes.appointment;
+			}else {
+				eventType = EventTypes.meeting;
+			}
 			int roomNr = resultSet.getInt("RoomNR");
 			int weeknr = resultSet.getInt("weekNR");
 
 			daysEventList.add(new Event(eventID, adminEmail, startingDate,
 					endDate, startTime, endTime, place, description, title,
-					employeeList, EventTypes.meeting, roomNr, weeknr));
+					employeeList, eventType, roomNr, weeknr));
 		}
 
 		return daysEventList;
 	}
 
-	public ArrayList<Event> getThisWeeksEvents(String email, Date date, int year)
+	public ArrayList<Event> getThisWeeksEvents(String email, String date, int year)
 			throws ParseException, SQLException {
 
-		DateToStringModifier dtsm = new DateToStringModifier();
-
-		int weekNumber = dtsm.getWeeksNumber(dtsm.getCompleteDate(date, year));
+		SimpleDateFormat sdf;
+        Calendar cal;
+        Date dateObject;
+        int weekNumber;
+        sdf = new SimpleDateFormat("MM/dd/yyyy");
+        dateObject = sdf.parse(date);
+        cal = Calendar.getInstance();
+        cal.setTime(dateObject);
+        weekNumber = cal.get(Calendar.WEEK_OF_MONTH);
+        System.out.println(weekNumber);
 		
 		ArrayList<Event> weekEventList = new ArrayList<Event>();
 		ArrayList<EventMaker> employeeList = new ArrayList<EventMaker>();
@@ -213,13 +233,18 @@ public class Query {
 			String place = resultSet.getString("Place");
 			String state = resultSet.getString("State");
 			String title = resultSet.getString("Title");
-			String meetingOrEvent = resultSet.getString("MeetingOrEvent");
+			EventTypes eventType;
+			if(resultSet.getString("MeetingOrEvent") == "appointment") {
+				eventType = EventTypes.appointment;
+			}else {
+				eventType = EventTypes.meeting;
+			}
 			int roomNr = resultSet.getInt("RoomNR");
 			int weekNR = resultSet.getInt("weekNR");
 
 			weekEventList.add(new Event(eventID, adminEmail, startDate,
 					endDate, startTime, endTime, place, description, title,
-					employeeList, EventTypes.meeting, roomNr, weekNR));
+					employeeList, eventType, roomNr, weekNR));
 		}
 
 		conn.connection.close();
