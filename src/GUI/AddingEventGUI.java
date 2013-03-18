@@ -360,8 +360,10 @@ public class AddingEventGUI extends JPanel {
 
 	public class ParticipantAdministrater implements ActionListener {
 
+		
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			
 			if (e.getSource() == addParticipant
 					&& potensialEmployeesModel.size() > 0) {
 
@@ -380,9 +382,10 @@ public class AddingEventGUI extends JPanel {
 				chosenEmployeesModel.removeElement(temp_EventMaker);
 
 			}
-
+			
 			chosenParticipants.setSelectedIndex(0);
 			potensialParticipants.setSelectedIndex(0);
+
 		}
 
 	}

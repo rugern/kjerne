@@ -79,7 +79,7 @@ public class MainProfileGUI extends JPanel {
 
 	ArrayList<Event> todaysEventsList;
 	ArrayList<Event> weekEvents;
-	
+
 	Date thisDate;
 	int thisYear;
 
@@ -101,7 +101,7 @@ public class MainProfileGUI extends JPanel {
 		cal = new JCalendar();
 		cal.setPreferredSize(new Dimension(300, 280));
 		cal.setDecorationBackgroundColor(Color.WHITE);
-		
+
 		thisDate = cal.getDate();
 		thisYear = cal.getDate().getYear();
 
@@ -368,12 +368,35 @@ public class MainProfileGUI extends JPanel {
 	// ActionsListeners
 	public class changeEvent implements ActionListener {
 
+		Event event;
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
+			
+			event = (Event) chosenDayEventList.getSelectedValue();
+			
 			addingEventGUI.titleTextField
-					.setText("Settes ut ifra verdiene til valgt hendelse");
+					.setText(event.getTitle());
+			addingEventGUI.descriptionTextField.setText(event.getDescription());
+			
+			
+			String dateString = event.getStartDate().replaceAll("/", "");
+			int day = Integer.parseInt(dateString.substring(0, 2));
+			int month = Integer.parseInt(dateString.substring(2,4));
+			int year = Integer.parseInt(dateString.substring(4,8))-1900));
+			
+			System.out.println(dateString);
+			
+			System.out.println(day);
+			System.out.println(month);
+			System.out.println(year);
+			
+			Date date = new Date(year, month, day);
+			
+			addingEventGUI.startDateChooser.setDate(date);
+			
+			System.out.println(date);
 			addingFrame.setVisible(true);
+			
 		}
 	}
 
@@ -425,12 +448,13 @@ public class MainProfileGUI extends JPanel {
 				String title = addingEventGUI.titleTextField.getText();
 
 				ArrayList<EventMaker> participants = new ArrayList<EventMaker>();
-				
-				for (int i = 0; i < addingEventGUI.chosenEmployeesModel.getSize(); i++) {
-					participants.add((EventMaker) addingEventGUI.chosenEmployeesModel.get(i));
-					System.out.println(addingEventGUI.chosenEmployeesModel.get(i));
+
+				for (int i = 0; i < addingEventGUI.chosenEmployeesModel
+						.getSize(); i++) {
+					participants
+							.add((EventMaker) addingEventGUI.chosenEmployeesModel
+									.get(i));
 				}
-				
 
 				EventTypes eventTypes = (EventTypes) addingEventGUI.eventTypeSelecter
 						.getSelectedItem();
@@ -452,7 +476,7 @@ public class MainProfileGUI extends JPanel {
 				addingFrame.setVisible(false);
 
 				todaysEventModel.clear();
-				
+
 				todaysEventsList = new Query().getEventByDate("@gmail.com",
 						cal.getDate(), cal.getDate().getYear());
 				todaysEventModel.addElement(new String());
@@ -462,7 +486,7 @@ public class MainProfileGUI extends JPanel {
 				}
 
 				weekModel.clear();
-				
+
 				weekEvents = new Query().getThisWeeksEvents("@gmail.com",
 						thisDate, thisYear);
 				weekModel.addElement(new String());
@@ -517,7 +541,7 @@ public class MainProfileGUI extends JPanel {
 
 						weekEvents = new Query().getThisWeeksEvents(
 								"@gmail.com", thisDate, thisYear);
-						
+
 						weekModel.addElement(new String());
 
 						for (int j = 0; j < weekEvents.size(); j++) {
@@ -586,7 +610,7 @@ public class MainProfileGUI extends JPanel {
 
 		public void infoViewer() {
 
-			JOptionPane.showMessageDialog(null, "INFORMASJON OM event");
+			
 		}
 
 		public void answerRequestViewer() {
