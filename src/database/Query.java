@@ -11,6 +11,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.xml.ws.handler.MessageContext.Scope;
+
 import com.mysql.jdbc.PreparedStatement;
 import datamodell.*;
 
@@ -73,16 +75,15 @@ public class Query {
 		}
 
 		return employees;
-
 	}
 
 	public void addEventToDatabase(String title, String email, int eventID,
 			String startTime, String endTime, String startDate, String endDate,
 			String description, String place, EventTypes eventtype, int roomNr,
-			int weekNR) throws SQLException {
+			int weekNR, ArrayList<EventMaker> participantList) throws SQLException {
 
 		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
-				.prepareStatement("INSERT INTO Event(EventID, Email, StartTime, EndTime, StartDate, EndDate, Place, Description, Title, MeetingOrEvent, RoomNR, weekNR ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
+				.prepareStatement("INSERT INTO Event(EventID, Email, StartTime, EndTime, StartDate, EndDate, Place, Description, Title, MeetingOrEvent, RoomNR, weekNR ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS );
 
 		preparedStatement.setInt(1, eventID);
 		preparedStatement.setString(2, email);
@@ -96,22 +97,51 @@ public class Query {
 		preparedStatement.setString(10, eventtype.toString());
 		preparedStatement.setInt(11, roomNr);
 		preparedStatement.setInt(12, weekNR);
-
+		
+		
 		preparedStatement.executeUpdate();
+		
+		resultSet = preparedStatement.getGeneratedKeys();
+		
+		PreparedStatement preparedStatement2 = (PreparedStatement) conn.connection.prepareStatement("INSERT INTO Participant(EventID, Email) VALUES (?,?)");
+
+		int id = 0;
+
+		while (resultSet.next()) {
+			id = resultSet.getInt(1);
+			System.out.println(id);
+			
+		}
+
+		preparedStatement2.setInt(1, id);
+		
+		for (int i = 0; i < participantList.size(); i++) {
+			preparedStatement2.setString(2, participantList.get(i).getEmail());
+			preparedStatement2.executeUpdate();
+		}
+		
 
 	}
 
-	public void updateEvent(String title, String email, String startTime,
-			String endTime, String description, String locale,
-			EventTypes eventtype, int roomNr, int eventID) throws SQLException {
+	public void updateEvent(String title, String startTime, String endTime,
+			String startDate, String endDate, String description,
+			String locale, EventTypes eventtype, int roomNr, int eventID,
+			int weekNR) throws SQLException {
 
 		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
-				.prepareStatement("UPDATE Event SET Title = " + title
-						+ ", Email = " + email + ", StartTime = " + startTime
-						+ ",  EndTime =" + endTime + ", Description ="
-						+ description + ", Locale = " + locale
-						+ ", MeetingOrEvent = " + eventtype + ", RoomNR = "
-						+ roomNr + "WHERE EventID = " + eventID);
+				.prepareStatement("UPDATE Event SET Title = ?, StartTime = ? ,  EndTime = ? , StartDate = ?, EndDate = ?, Description = ?, Place = ?, MeetingOrEvent = ?,  RoomNR = ? , weekNR = ? WHERE EventID = ?");
+
+		preparedStatement.setString(1, title);
+		preparedStatement.setString(2, startTime);
+		preparedStatement.setString(3, endTime);
+		preparedStatement.setString(4, startDate);
+		preparedStatement.setString(5, endDate);
+		preparedStatement.setString(6, description);
+		preparedStatement.setString(7, locale);
+		preparedStatement.setString(8, eventtype.toString());
+		preparedStatement.setInt(9, roomNr);
+		preparedStatement.setInt(10, weekNR);
+		preparedStatement.setInt(11, eventID);
 
 		preparedStatement.executeUpdate();
 	}

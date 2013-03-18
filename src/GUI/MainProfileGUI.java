@@ -39,6 +39,7 @@ public class MainProfileGUI extends JPanel {
 
 	JFrame addingFrame = new JFrame("Ny avtale");
 	JFrame employeeCalenderFrame = new JFrame("Kalender for ansatt");
+	JFrame changingFrame = new JFrame("Endre avtale");
 
 	JPanel completePanel;
 	JPanel mainWestPanel;
@@ -64,6 +65,7 @@ public class MainProfileGUI extends JPanel {
 
 	AddingEventGUI addingEventGUI = new AddingEventGUI();
 	EmployeeCalenderGUI employeeCalenderGUI = new EmployeeCalenderGUI();
+	ChangeEventGUI changeEventGUI = new ChangeEventGUI();
 
 	DateToStringModifier dtsm;
 
@@ -198,8 +200,8 @@ public class MainProfileGUI extends JPanel {
 		westSouthLowerPanel.setBackground(Color.WHITE);
 
 		try {
-			ArrayList<Event> weekEvents = new Query().getThisWeeksEvents(
-					"@gmail.com", cal.getDate(), cal.getDate().getYear());
+			weekEvents = new Query().getThisWeeksEvents("@gmail.com",
+					cal.getDate(), cal.getDate().getYear());
 
 			weekModel = new DefaultListModel();
 			weekModel.addElement(new String());
@@ -347,6 +349,14 @@ public class MainProfileGUI extends JPanel {
 		employeeCalenderFrame.setVisible(false);
 		employeeCalenderFrame.getContentPane().add(employeeCalenderGUI);
 
+		changeEventGUI.cancelUpdateButton
+				.addActionListener(new cancelNewEvent());
+		changeEventGUI.updateEventButton.addActionListener(new UpdateEvent());
+		changingFrame.setMinimumSize(new Dimension(480, 450));
+		changingFrame.setMaximumSize(new Dimension(480, 450));
+		changingFrame.setVisible(false);
+		changingFrame.getContentPane().add(changeEventGUI);
+
 	}
 
 	// Control labels
@@ -369,35 +379,144 @@ public class MainProfileGUI extends JPanel {
 	public class changeEvent implements ActionListener {
 
 		Event event;
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
 			event = (Event) chosenDayEventList.getSelectedValue();
-			
-			addingEventGUI.titleTextField
-					.setText(event.getTitle());
-			addingEventGUI.descriptionTextField.setText(event.getDescription());
-			
-			
-			String dateString = event.getStartDate().replaceAll("/", "");
-			int day = Integer.parseInt(dateString.substring(0, 2));
-			int month = Integer.parseInt(dateString.substring(2,4));
-			int year = Integer.parseInt(dateString.substring(4,8))-1900));
-			
-			System.out.println(dateString);
-			
-			System.out.println(day);
-			System.out.println(month);
-			System.out.println(year);
-			
-			Date date = new Date(year, month, day);
-			
-			addingEventGUI.startDateChooser.setDate(date);
-			
-			System.out.println(date);
-			addingFrame.setVisible(true);
-			
+
+			if (event.getAdminEmail().equals("@gmail.com")) {
+				try {
+
+					changeEventGUI.titleTextField.setText(event.getTitle());
+					changeEventGUI.descriptionTextField.setText(event
+							.getDescription());
+
+					String startDateString = event.getStartDate().replaceAll(
+							"/", "");
+					int startDay = Integer.parseInt(startDateString.substring(
+							0, 2));
+					int startDateMonth = Integer.parseInt(startDateString
+							.substring(2, 4));
+					int startDateyear = Integer.parseInt(startDateString
+							.substring(4, 8));
+					startDateyear = startDateyear - 1900;
+					startDateMonth = startDateMonth - 1;
+
+					String endDateString = event.getEndDate().replaceAll("/",
+							"");
+					int endDay = Integer
+							.parseInt(endDateString.substring(0, 2));
+					int endMonth = Integer.parseInt(endDateString.substring(2,
+							4));
+					int endYear = Integer.parseInt(endDateString
+							.substring(4, 8));
+					endYear = endYear - 1900;
+					endMonth = endMonth - 1;
+
+					Date startdate = new Date(startDateyear, startDateMonth,
+							startDay);
+					Date endDate = new Date(endYear, endMonth, endDay);
+
+					changeEventGUI.startDateChooser.setDate(startdate);
+					changeEventGUI.endDateChooser.setDate(endDate);
+
+					changeEventGUI.startTimeHourSpin.setValue(Integer
+							.parseInt(event.getStartTime().substring(0, 2)));
+					changeEventGUI.startTimeMinuteSpin.setValue(Integer
+							.parseInt(event.getStartTime().substring(2, 4)
+									.replaceAll(":", "")));
+
+					changeEventGUI.endTimeHourSpin.setValue(Integer
+							.parseInt(event.getEndTime().substring(0, 2)));
+					changeEventGUI.endTimeMinuteSpin.setValue(Integer
+							.parseInt(event.getEndTime().substring(2, 4)
+									.replaceAll(":", "")));
+
+					changeEventGUI.roomSelecter.setSelectedItem(event
+							.getRoomNR());
+					changeEventGUI.placeField.setText(event.getPlace());
+
+					changeEventGUI.roomSelecter.setSelectedItem(event
+							.getEventTypes());
+
+					changingFrame.setVisible(true);
+
+				} catch (NullPointerException e2) {
+
+					JOptionPane.showMessageDialog(null, "Du må velge en event");
+				}
+
+			}else{
+				JOptionPane.showMessageDialog(null, "Du kan ikke endre denne eventen da du ikke opprettet den");
+			}
 		}
+	}
+
+	public class UpdateEvent implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			try {
+				Event event = (Event) chosenDayEventList.getSelectedValue();
+
+				dtsm = new DateToStringModifier();
+
+				String startDate = dtsm.getCompleteDate(
+						changeEventGUI.startDateChooser.getDate(),
+						changeEventGUI.startDateChooser.getDate().getYear());
+				String endDate = dtsm.getCompleteDate(
+						changeEventGUI.endDateChooser.getDate(),
+						changeEventGUI.endDateChooser.getDate().getYear());
+
+				String startTime = String
+						.valueOf(changeEventGUI.startTimeHourSpin.getValue())
+						+ ":"
+						+ String.valueOf(changeEventGUI.startTimeMinuteSpin
+								.getValue());
+				String endTime = String.valueOf(changeEventGUI.endTimeHourSpin
+						.getValue())
+						+ ":"
+						+ String.valueOf(changeEventGUI.endTimeMinuteSpin
+								.getValue());
+
+				String place = changeEventGUI.placeField.getText();
+				String description = changeEventGUI.descriptionTextField
+						.getText();
+				String title = changeEventGUI.titleTextField.getText();
+
+				ArrayList<EventMaker> participants = new ArrayList<EventMaker>();
+
+				for (int i = 0; i < changeEventGUI.chosenEmployeesModel.size(); i++) {
+					participants
+							.add((EventMaker) changeEventGUI.chosenEmployeesModel
+									.get(i));
+				}
+
+				EventTypes eventTypes = (EventTypes) changeEventGUI.eventTypeSelecter
+						.getSelectedItem();
+
+				// Needs to be altered
+				int roomNr = 8;
+				// (Integer) addingEventGUI.roomSelecter.getSelectedItem();
+
+				int weekNr = dtsm.getWeeksNumber(dtsm.getCompleteDate(
+						changeEventGUI.startDateChooser.getDate(),
+						changeEventGUI.endDateChooser.getDate().getYear()));
+
+				changingFrame.setVisible(false);
+
+				new Query().updateEvent(title, startTime, endTime, startDate,
+						endDate, description, place, eventTypes, roomNr,
+						event.getID(), weekNr);
+
+			} catch (SQLException e1) {
+				System.out.println("error on update");
+				e1.printStackTrace();
+			}
+
+		}
+
 	}
 
 	public class addNewEvent implements ActionListener {
@@ -411,7 +530,11 @@ public class MainProfileGUI extends JPanel {
 	public class cancelNewEvent implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			addingFrame.setVisible(false);
+			if (e.getSource() == addingEventGUI.cancelNewEventButton) {
+				addingFrame.setVisible(false);
+			} else if (e.getSource() == changeEventGUI.cancelUpdateButton) {
+				changingFrame.setVisible(false);
+			}
 
 		}
 	}
@@ -610,7 +733,6 @@ public class MainProfileGUI extends JPanel {
 
 		public void infoViewer() {
 
-			
 		}
 
 		public void answerRequestViewer() {

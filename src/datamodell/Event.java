@@ -59,11 +59,12 @@ public class Event {
 		this.endTime = endTime; 
 		this.description = description;
 		this.title = title;
+		this.participants = participants;
 		this.weekNr = weekNR;
 		this.participants = participants;
 		this.setEventTypes(eventTypes);
 		try {
-			new database.Query().addEventToDatabase(title, adminEmail, ID, startTime, endTime, startDate, endDate, description, place, eventTypes,  roomNr, weekNR);
+			new database.Query().addEventToDatabase(title, adminEmail, ID, startTime, endTime, startDate, endDate, description, place, eventTypes,  roomNr, weekNR, participants);
 		} catch (SQLException e) {
 		}
 		
@@ -86,9 +87,9 @@ public class Event {
 		this.participants = participants;
 		this.setEventTypes(eventTypes);
 		try {
-			new database.Query().addEventToDatabase(title, adminEmail, ID, startTime, endTime, startDate, endDate, description, place, eventTypes,  roomNr, weekNR);
+			new database.Query().addEventToDatabase(title, adminEmail, ID, startTime, endTime, startDate, endDate, description, place, eventTypes,  roomNr, weekNR, participants);
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 		
 		//socket.createEventQuery(adminEmail, startDate, endDate, locale, description, title, participants, eventTypes);
@@ -200,6 +201,10 @@ public class Event {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+	
+	public int getRoomNR(){
+		return this.roomNr;
 	}
 
 	public List<EventMaker> getParticipants() {
