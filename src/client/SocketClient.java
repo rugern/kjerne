@@ -15,7 +15,6 @@ import server.CommPack;
  * 
  * PRELIMINARY
  * @author Jama
- *
  */
 public class SocketClient {
 
@@ -25,7 +24,6 @@ public class SocketClient {
 	String servName;
 	int port;
 	SocketClientListener socketClientListener;
-
 
 	public SocketClient(String server, int port) 
 	{
@@ -76,7 +74,6 @@ public class SocketClient {
 		}
 
 		//ClientUnpacker.unpackClientMessage(socketClientListener.getLatestMessage());
-
 	}
 
 	public void close()

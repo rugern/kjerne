@@ -46,7 +46,6 @@ public class SocketClientListener extends Thread
 				
 				//test that login is handled right
 				ClientPacketHandler.handlePacket(reply);
-
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

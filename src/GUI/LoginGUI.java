@@ -79,7 +79,6 @@ public class LoginGUI extends JPanel {
 			al.add(user);
 			al.add(pw);
 			client.sendMessage(new CommPack(CommEnum.LOGIN, al));
-
 		}
 	}
 

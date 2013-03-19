@@ -864,4 +864,9 @@ public class MainProfileGUI extends JPanel {
 			return this;
 		}
 	}
+
+	public void setUserEmail(String text) {
+		// TODO Auto-generated method stub
+		
+	}
 }
