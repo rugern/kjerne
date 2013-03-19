@@ -4,15 +4,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.net.SocketException;
-
-import datamodell.Employee;
 
 /**
- * There is one of of these threads for each user logged in, it holds the ID of the Owner logged in and handles all input and output.
- * 
- * PRELIMINARY
- * @author halvor //TODO
+ * There is one of of these threads for each user logged in, it holds the username
+ * of the user.
+ * @author Jama
  */
 public class ServerThread extends Thread
 {
@@ -22,7 +18,7 @@ public class ServerThread extends Thread
 	private int number;
 	private boolean stop = false;
 	private boolean loggedIn = false;
-	private Employee user = null; 
+	private String user = null; 
 	
 	public ServerThread(Socket socket, int threadNumber)  
 	{
@@ -38,10 +34,9 @@ public class ServerThread extends Thread
 			in = new ObjectInputStream(socket.getInputStream());
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("IOException!\n"+e.getMessage());
 			e.printStackTrace();
 		}
-		
 	}
 	/**
 	 * Read incoming messages, parse message by using ServerUnpacker, send reply as returne by ServerUnpacker.
@@ -52,50 +47,38 @@ public class ServerThread extends Thread
 	{
 		while (!stop)
 		{
-			
 	        try {
-				CommPack message = (CommPack) in.readObject();
-				
+				CommPack message = (CommPack) in.readObject(); //here is the packet receieved from client
+			
 				CommPack reply;
-				//reply = ServerUnpacker.unpackServerMessage(message, this);
+				reply = ServerPacketHandler.handlePacket(message, this);
 				
-				/*if (reply != null)
+				if (reply != null)
 				{
 					sendMessage(reply);
 					System.out.println("Server thread #" + number + " sent reply to msg: " + message.getMessageName());
-				}*/ //TODO set up reply system, priority #3
-				//
-				//System.out.println(message.getMessageName());
-				//sendMessage(message);
-
+				}
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
-				System.err.println("Class not recognized");
+				System.err.println("Class not recognized!");
 			} catch (IOException e) {
-				//e.printStackTrace();
-				System.err.println("Socket closed!");
+				e.printStackTrace();
+				System.err.println("IOException!");
 				stopThread();
 			}
-	        
-	        
-	        // sleep for a while! Hvorfor? Load? -Halvor
+	       
 	        try {
 				ServerThread.sleep(50);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				System.err.println("InterruptedException!\n"+e.getMessage());
 				e.printStackTrace();
 			}
 		}
 		close();
-
 	}
 
 	/**
-	 * sends a CommMessage, synchronized because it is accessed both by this thread and the main thread in Server.java
-	 * @param msg
-	 * 
-	 * @author halvor
+	 * sends a CommPack package through current connection
 	 */
 	public synchronized void sendMessage(CommPack msg)
 	{
@@ -109,34 +92,41 @@ public class ServerThread extends Thread
 		{
 			e.printStackTrace();
 		}
-
 	}
 
 	public void stopThread()
 	{
 		stop = true;
 	}
+	
 	/**
-	 * closes the connection of this thread, if there is a user logged on, remove that user from the list of logged in clients.
-	 * 
-	 * @author halvor
+	 * closes the connection of this thread, if there is a user logged on,
+	 * remove that user from the list of logged in clients.
 	 */
 	public void close()
 	{
-		/*if (getUser() != null)
-		{
-			int clientIndex = Server.loggedInClients.indexOf(getOwner().getOwnerId());
-			if (clientIndex != -1)
-				Server.loggedInClients.remove(clientIndex);
-		}*/ //TODO introduce list of users logged in.
+		loginFalse();
 		out = null;
 		in = null;
 		connection = null;
 	}
 	
-	public void setLoggedIn(boolean b)
+	/**
+	 * User has been verified, add to list of logged in users
+	 */
+	public void loginTrue()
 	{
-		loggedIn = b;
+		loggedIn = true;
+		Server.logUserIn(this);
+	}
+	
+	/**
+	 * Logging off, remove from list of logged in
+	 */
+	public void loginFalse()
+	{
+		loggedIn = false;
+		Server.logUserOff(this);
 	}
 	
 	public boolean getLoggedIn()
@@ -144,16 +134,13 @@ public class ServerThread extends Thread
 		return this.loggedIn;
 	}
 	
-	public void setUser(Employee e)
+	public void setUser(String user)
 	{
-		user = e;
+		this.user = user;
 	}
 	
-	public Employee getUser()
+	public String getUser()
 	{
 		return user;
 	}
-	
-	
-
 }

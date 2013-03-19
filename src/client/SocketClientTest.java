@@ -1,18 +1,41 @@
 package client;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+
+import server.CommEnum;
+import server.CommPack; 
 
 public class SocketClientTest {
 
+	private static SocketClient client;
+	
 	public static void main(String[] args)
 	{
-		SocketClient client = new SocketClient("127.0.0.1", 1337);
+		client = new SocketClient("127.0.0.1", 1337);
 		try {
 			client.run();
+			
+			sendMessageTest(); //test 1
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Tests that packets can be sent to server
+	 */
+	public static void sendMessageTest()
+	{
+		/*
+		ArrayList al = new ArrayList();
+		al.add("test1@testlab.org");
+		al.add(new Date(1367575200));
+		*/
+		client.sendMessage(new CommPack(CommEnum.GETROOMSANDDATE, null));		
 	}
 
 }
