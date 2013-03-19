@@ -21,7 +21,7 @@ public class Conn {
 			Class.forName("com.mysql.jdbc.Driver");
 
 			connection = DriverManager.getConnection(
-					"jdbc:mysql://localhost:3306/fellesprosjekt", "root", "");
+					"jdbc:mysql://mysql.stud.ntnu.no:3306/nilsiru_felles", "nilsiru_gruppe11@cura.itea.ntnu.no", "felles");
 			
 		} catch (ClassNotFoundException e) {
 			System.out.println("Error " + e.getMessage());

@@ -1,22 +1,20 @@
 package database;
 
+import GUI.*;
+
+import java.lang.reflect.Array;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
-import GUI.DateToStringModifier;
-import GUI.EventTypes;
+import javax.xml.ws.handler.MessageContext.Scope;
 
 import com.mysql.jdbc.PreparedStatement;
-
-import datamodell.Employee;
-import datamodell.Event;
-import datamodell.EventMaker;
-import datamodell.Locale;
+import datamodell.*;
 
 public class Query {
 
@@ -59,6 +57,120 @@ public class Query {
 		return resultSet;
 	}
 
+	public ArrayList<Event> getSentInvitations(String senderEmail)
+			throws SQLException {
+
+		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
+				.prepareStatement("SELECT EventID, Email, StartTime, EndTime, StartDate, EndDate, Description, Place, State, Title, MeetingOrEvent, Roomnr, weekNR FROM Event WHERE Email = ? AND MeetingOrEvent = 'meeting'");
+
+		preparedStatement.setString(1, senderEmail);
+
+		resultSet = preparedStatement.executeQuery();
+
+		ArrayList<Event> sentInvitationList = new ArrayList<Event>();
+
+		while (resultSet.next()) {
+
+			int eventID = resultSet.getInt("EventID");
+			String adminEmail = resultSet.getString("Event.Email");
+			String startTime = resultSet.getString("StartTime");
+			String endTime = resultSet.getString("EndTime");
+			String startingDate = resultSet.getString("StartDate");
+			String endDate = resultSet.getString("EndDate");
+			String description = resultSet.getString("Description");
+			String place = resultSet.getString("Place");
+			String state = resultSet.getString("State");
+			String title = resultSet.getString("Title");
+			String meetingOrEvent = resultSet.getString("MeetingOrEvent");
+			int roomNr = resultSet.getInt("RoomNR");
+			int weeknr = resultSet.getInt("weekNR");
+
+			PreparedStatement preparedStatement2 = (PreparedStatement) conn.connection
+					.prepareStatement("SELECT Participant.Email, Name from Participant Join Employee WHERE Employee.Email = Participant.Email AND EventID = ?");
+
+			preparedStatement2.setInt(1, eventID);
+
+			ResultSet resultSet2 = preparedStatement2.executeQuery();
+
+			ArrayList<EventMaker> employeeList = new ArrayList<EventMaker>();
+
+			while (resultSet2.next()) {
+
+				String email = resultSet2.getString("Email");
+				String name = resultSet2.getString("Name");
+
+				employeeList.add(new Employee(email, name));
+
+				if (employeeList.size() > 0) {
+
+					sentInvitationList.add(new Event(eventID, adminEmail,
+							startingDate, endDate, startTime, endTime, place,
+							description, title, employeeList,
+							EventTypes.meeting, roomNr, weeknr));
+				}
+			}
+
+		}
+
+		return sentInvitationList;
+
+	}
+
+	public ArrayList<Event> getRecievedInvitations(String recieverEmail)
+			throws SQLException {
+
+		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
+				.prepareStatement("SELECT DISTINCT Event.EventID, Event.Email, StartTime, EndTime, StartDate, EndDate, Description, Place, State, Title, MeetingOrEvent, Roomnr, weekNR FROM Event JOIN Participant WHERE Event.EventID = Participant.EventID AND Participant.Email = ?");
+		preparedStatement.setString(1, recieverEmail);
+
+		resultSet = preparedStatement.executeQuery();
+
+		ArrayList<Event> recievedInvitationsList = new ArrayList<Event>();
+
+		while (resultSet.next()) {
+
+			int eventID = resultSet.getInt("EventID");
+			String adminEmail = resultSet.getString("Event.Email");
+			String startTime = resultSet.getString("StartTime");
+			String endTime = resultSet.getString("EndTime");
+			String startingDate = resultSet.getString("StartDate");
+			String endDate = resultSet.getString("EndDate");
+			String description = resultSet.getString("Description");
+			String place = resultSet.getString("Place");
+			String state = resultSet.getString("State");
+			String title = resultSet.getString("Title");
+			String meetingOrEvent = resultSet.getString("MeetingOrEvent");
+			int roomNr = resultSet.getInt("RoomNR");
+			int weeknr = resultSet.getInt("weekNR");
+
+			PreparedStatement preparedStatement2 = (PreparedStatement) conn.connection
+					.prepareStatement("SELECT Participant.Email, Name from Participant Join Employee WHERE Employee.Email = Participant.Email AND EventID = ?");
+
+			preparedStatement2.setInt(1, eventID);
+
+			ResultSet resultSet2 = preparedStatement2.executeQuery();
+
+			ArrayList<EventMaker> employeeList = new ArrayList<EventMaker>();
+
+			while (resultSet2.next()) {
+
+				String email = resultSet2.getString("Email");
+				String name = resultSet2.getString("Name");
+
+				employeeList.add(new Employee(email, name));
+
+			}
+
+			recievedInvitationsList.add(new Event(eventID, adminEmail,
+					startingDate, endDate, startTime, endTime, place,
+					description, title, employeeList, EventTypes.meeting,
+					roomNr, weeknr));
+
+		}
+
+		return recievedInvitationsList;
+	}
+
 	public ArrayList<Employee> getEmployees() throws SQLException {
 
 		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
@@ -77,15 +189,18 @@ public class Query {
 		}
 
 		return employees;
-
 	}
 
 	public void addEventToDatabase(String title, String email, int eventID,
 			String startTime, String endTime, String startDate, String endDate,
-			String description, String place, EventTypes eventtype, int roomNr, int weekNR) throws SQLException {
+			String description, String place, EventTypes eventtype, int roomNr,
+			int weekNR, ArrayList<EventMaker> participantList)
+			throws SQLException {
 
 		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
-				.prepareStatement("INSERT INTO Event(EventID, Email, StartTime, EndTime, StartDate, EndDate, Place, Description, Title, MeetingOrEvent, RoomNR, weekNR ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
+				.prepareStatement(
+						"INSERT INTO Event(EventID, Email, StartTime, EndTime, StartDate, EndDate, Place, Description, Title, MeetingOrEvent, RoomNR, weekNR ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+						Statement.RETURN_GENERATED_KEYS);
 
 		preparedStatement.setInt(1, eventID);
 		preparedStatement.setString(2, email);
@@ -102,26 +217,47 @@ public class Query {
 
 		preparedStatement.executeUpdate();
 
+		resultSet = preparedStatement.getGeneratedKeys();
+
+		PreparedStatement preparedStatement2 = (PreparedStatement) conn.connection
+				.prepareStatement("INSERT INTO Participant(EventID, Email) VALUES (?,?)");
+
+		int id = 0;
+
+		while (resultSet.next()) {
+			id = resultSet.getInt(1);
+
+		}
+
+		preparedStatement2.setInt(1, id);
+
+		for (int i = 0; i < participantList.size(); i++) {
+			preparedStatement2.setString(2, participantList.get(i).getEmail());
+			preparedStatement2.executeUpdate();
+		}
+
 	}
 
-	public void updateEvent(String title, String email, String startTime,
-			String endTime, String description, String locale,
-			EventTypes eventtype, int roomNr, int eventID) throws SQLException {
+	public void updateEvent(String title, String startTime, String endTime,
+			String startDate, String endDate, String description,
+			String locale, EventTypes eventtype, int roomNr, int eventID,
+			int weekNR) throws SQLException {
 
 		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
-				.prepareStatement("UPDATE Event SET Title = ?, Email = ?, StartTime = ?,  EndTime =?, " +
-						"Description =?, Place = ?, MeetingOrEvent = ?, Roomnr = ? WHERE EventID = ?");
-		
+				.prepareStatement("UPDATE Event SET Title = ?, StartTime = ? ,  EndTime = ? , StartDate = ?, EndDate = ?, Description = ?, Place = ?, MeetingOrEvent = ?,  RoomNR = ? , weekNR = ? WHERE EventID = ?");
+
 		preparedStatement.setString(1, title);
-		preparedStatement.setString(2, email);
-		preparedStatement.setString(3, startTime);
-		preparedStatement.setString(4, endTime);
-		preparedStatement.setString(5, description);
-		preparedStatement.setString(6, locale);
-		preparedStatement.setString(7, eventtype.toString());
-		preparedStatement.setInt(8, roomNr);
-		preparedStatement.setInt(9, eventID);
-		
+		preparedStatement.setString(2, startTime);
+		preparedStatement.setString(3, endTime);
+		preparedStatement.setString(4, startDate);
+		preparedStatement.setString(5, endDate);
+		preparedStatement.setString(6, description);
+		preparedStatement.setString(7, locale);
+		preparedStatement.setString(8, eventtype.toString());
+		preparedStatement.setInt(9, roomNr);
+		preparedStatement.setInt(10, weekNR);
+		preparedStatement.setInt(11, eventID);
+
 		preparedStatement.executeUpdate();
 	}
 
@@ -147,17 +283,18 @@ public class Query {
 
 	// Use own email if you want events associated with yourself, use
 	// employeeEmail if you want events associated with an employee
-	public ArrayList<Event> getEventByDate(String email, String startDate, int year)
+	public ArrayList<Event> getEventByDate(String email, Date date, int year)
 			throws SQLException {
 
 		DateToStringModifier dtsm = new DateToStringModifier();
 
+		String startDate = dtsm.getCompleteDate(date, year);
+
 		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
-				.prepareStatement("SELECT DISTINCT Event.EventID, Event.Email, StartTime, EndTime, StartDate, EndDate, Description, Place, State, Title, MeetingOrEvent, Roomnr, weekNR FROM Event JOIN Participant WHERE StartDate = ? AND (Event.Email = ? OR Participant.Email = ?) ");
+				.prepareStatement("SELECT DISTINCT Event.EventID, Event.Email, StartTime, EndTime, StartDate, EndDate, Description, Place, State, Title, MeetingOrEvent, Roomnr, weekNR FROM Event JOIN Participant WHERE Event.EventID = Participant.EventID AND StartDate = ? AND Participant.Email = ? ");
 
 		preparedStatement.setString(1, startDate);
 		preparedStatement.setString(2, email);
-		preparedStatement.setString(3, email);
 
 		resultSet = preparedStatement.executeQuery();
 
@@ -177,46 +314,64 @@ public class Query {
 			String place = resultSet.getString("Place");
 			String state = resultSet.getString("State");
 			String title = resultSet.getString("Title");
-			EventTypes eventType;
-			if(resultSet.getString("MeetingOrEvent") == "appointment") {
-				eventType = EventTypes.appointment;
-			}else {
-				eventType = EventTypes.meeting;
-			}
+			String meetingOrEvent = resultSet.getString("MeetingOrEvent");
 			int roomNr = resultSet.getInt("RoomNR");
 			int weeknr = resultSet.getInt("weekNR");
 
 			daysEventList.add(new Event(eventID, adminEmail, startingDate,
 					endDate, startTime, endTime, place, description, title,
-					employeeList, eventType, roomNr, weeknr));
+					employeeList, EventTypes.meeting, roomNr, weeknr));
+
+		}
+
+		PreparedStatement preparedStatement2 = (PreparedStatement) conn.connection
+				.prepareStatement("SELECT EventID, Email, StartTime, EndTime, StartDate, EndDate, Description, Place, State, Title, MeetingOrEvent, Roomnr, weekNR FROM Event WHERE StartDate = ? AND Email = ? ");
+
+		preparedStatement2.setString(1, startDate);
+		preparedStatement2.setString(2, email);
+
+		resultSet = preparedStatement2.executeQuery();
+
+		while (resultSet.next()) {
+
+			int eventID = resultSet.getInt("EventID");
+			// email from parameters
+			String adminEmail = resultSet.getString("Email");
+			String startTime = resultSet.getString("StartTime");
+			String endTime = resultSet.getString("EndTime");
+			String startingDate = resultSet.getString("StartDate");
+			String endDate = resultSet.getString("EndDate");
+			String description = resultSet.getString("Description");
+			String place = resultSet.getString("Place");
+			String state = resultSet.getString("State");
+			String title = resultSet.getString("Title");
+			String meetingOrEvent = resultSet.getString("MeetingOrEvent");
+			int roomNr = resultSet.getInt("RoomNR");
+			int weeknr = resultSet.getInt("weekNR");
+
+			daysEventList.add(new Event(eventID, adminEmail, startingDate,
+					endDate, startTime, endTime, place, description, title,
+					employeeList, EventTypes.meeting, roomNr, weeknr));
 		}
 
 		return daysEventList;
 	}
 
-	public ArrayList<Event> getThisWeeksEvents(String email, String date, int year)
+	public ArrayList<Event> getThisWeeksEvents(String email, Date date, int year)
 			throws ParseException, SQLException {
 
-		SimpleDateFormat sdf;
-        Calendar cal;
-        Date dateObject;
-        int weekNumber;
-        sdf = new SimpleDateFormat("MM/dd/yyyy");
-        dateObject = sdf.parse(date);
-        cal = Calendar.getInstance();
-        cal.setTime(dateObject);
-        weekNumber = cal.get(Calendar.WEEK_OF_MONTH);
-        System.out.println(weekNumber);
-		
+		DateToStringModifier dtsm = new DateToStringModifier();
+
+		int weekNumber = dtsm.getWeeksNumber(dtsm.getCompleteDate(date, year));
+
 		ArrayList<Event> weekEventList = new ArrayList<Event>();
 		ArrayList<EventMaker> employeeList = new ArrayList<EventMaker>();
 
 		PreparedStatement preparedStatement = (PreparedStatement) conn.connection
-				.prepareStatement("SELECT DISTINCT Event.EventID, Event.Email, StartTime, EndTime, StartDate, EndDate, Description, Place, State, Title, MeetingOrEvent, Roomnr, weekNR FROM Event JOIN Participant WHERE (Event.Email = ? OR Participant.Email = ?) AND weekNR = ?");
+				.prepareStatement("SELECT DISTINCT Event.EventID, Event.Email, StartTime, EndTime, StartDate, EndDate, Description, Place, State, Title, MeetingOrEvent, Roomnr, weekNR FROM Event JOIN Participant WHERE Event.EventID = Participant.EventID  AND Participant.Email = ? AND weekNR = ?");
 
 		preparedStatement.setString(1, email);
-		preparedStatement.setString(2, email);
-		preparedStatement.setInt(3, weekNumber);
+		preparedStatement.setInt(2, weekNumber);
 
 		resultSet = preparedStatement.executeQuery();
 
@@ -233,18 +388,43 @@ public class Query {
 			String place = resultSet.getString("Place");
 			String state = resultSet.getString("State");
 			String title = resultSet.getString("Title");
-			EventTypes eventType;
-			if(resultSet.getString("MeetingOrEvent") == "appointment") {
-				eventType = EventTypes.appointment;
-			}else {
-				eventType = EventTypes.meeting;
-			}
+			String meetingOrEvent = resultSet.getString("MeetingOrEvent");
 			int roomNr = resultSet.getInt("RoomNR");
 			int weekNR = resultSet.getInt("weekNR");
 
 			weekEventList.add(new Event(eventID, adminEmail, startDate,
 					endDate, startTime, endTime, place, description, title,
-					employeeList, eventType, roomNr, weekNR));
+					employeeList, EventTypes.meeting, roomNr, weekNR));
+		}
+
+		PreparedStatement preparedStatement2 = (PreparedStatement) conn.connection
+				.prepareStatement("SELECT EventID, Email, StartTime, EndTime, StartDate, EndDate, Description, Place, State, Title, MeetingOrEvent, Roomnr, weekNR FROM Event WHERE weekNR = ? AND Email = ? ");
+
+		preparedStatement2.setInt(1, weekNumber);
+		preparedStatement2.setString(2, email);
+
+		resultSet = preparedStatement2.executeQuery();
+
+		while (resultSet.next()) {
+
+			int eventID = resultSet.getInt("EventID");
+			// email from parameters
+			String adminEmail = resultSet.getString("Email");
+			String startTime = resultSet.getString("StartTime");
+			String endTime = resultSet.getString("EndTime");
+			String startingDate = resultSet.getString("StartDate");
+			String endDate = resultSet.getString("EndDate");
+			String description = resultSet.getString("Description");
+			String place = resultSet.getString("Place");
+			String state = resultSet.getString("State");
+			String title = resultSet.getString("Title");
+			String meetingOrEvent = resultSet.getString("MeetingOrEvent");
+			int roomNr = resultSet.getInt("RoomNR");
+			int weeknr = resultSet.getInt("weekNR");
+
+			weekEventList.add(new Event(eventID, adminEmail, startingDate,
+					endDate, startTime, endTime, place, description, title,
+					employeeList, EventTypes.meeting, roomNr, weeknr));
 		}
 
 		conn.connection.close();

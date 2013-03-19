@@ -12,7 +12,7 @@ public class DatabaseConnectionExample {
 	private static String url = "jdbc:mysql://mysql.stud.ntnu.no:3306/nilsiru_felles"; //address of mySQL server
 	private static String user = "nilsiru_gruppe11@cura.itea.ntnu.no"; //Effective username at server
 	private static String pw = "felles"; //Password
-	private static String sql = "SELECT Name FROM Employee"; //SQL-query used in example
+	private static String sql = "SELECT Navn FROM Ansatt"; //SQL-query used in example
 	private static ResultSet result; //Saves the result from query
 	private static ResultSetMetaData metadata; //Saves info about result
 
@@ -42,6 +42,7 @@ public class DatabaseConnectionExample {
 			try {
 				while (result.next()) {
 					System.out.println(result.getString(i));
+					i++;
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();

@@ -35,7 +35,7 @@ import com.toedter.calendar.JDateChooser;
 import database.Query;
 import datamodell.Locale;
 
-public class AddingEventGUI extends JPanel {
+public class ChangeEventGUI extends JPanel {
 
 	JPanel mainPanel;
 
@@ -54,8 +54,8 @@ public class AddingEventGUI extends JPanel {
 
 	JPanel southPanel;
 
-	JButton completeNewEventButton = new JButton("Fullfør");
-	JButton cancelNewEventButton = new JButton("Avbryt");
+	JButton updateEventButton = new JButton("Oppdater");
+	JButton cancelUpdateButton = new JButton("Avbryt");
 
 	// Needed components
 	JTextField titleTextField;
@@ -77,7 +77,7 @@ public class AddingEventGUI extends JPanel {
 	DefaultListModel potensialEmployeesModel;
 	DefaultListModel chosenEmployeesModel;
 
-	public AddingEventGUI() {
+	public ChangeEventGUI() {
 
 		setLayout(new BorderLayout());
 		setBackground(new Color(0xd6d5d7));
@@ -324,8 +324,8 @@ public class AddingEventGUI extends JPanel {
 		southPanel.setBackground(Color.WHITE);
 		southPanel.setPreferredSize(new Dimension(435, 40));
 
-		southPanel.add(completeNewEventButton);
-		southPanel.add(cancelNewEventButton);
+		southPanel.add(updateEventButton);
+		southPanel.add(cancelUpdateButton);
 
 		// MainPanel
 		mainPanel = new JPanel();
@@ -341,6 +341,7 @@ public class AddingEventGUI extends JPanel {
 		add(mainPanel);
 
 	}
+
 
 	public class roomRenderer extends JLabel implements ListCellRenderer {
 
@@ -360,10 +361,9 @@ public class AddingEventGUI extends JPanel {
 
 	public class ParticipantAdministrater implements ActionListener {
 
-		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
+
 			if (e.getSource() == addParticipant
 					&& potensialEmployeesModel.size() > 0) {
 
@@ -382,7 +382,7 @@ public class AddingEventGUI extends JPanel {
 				chosenEmployeesModel.removeElement(temp_EventMaker);
 
 			}
-			
+
 			chosenParticipants.setSelectedIndex(0);
 			potensialParticipants.setSelectedIndex(0);
 
@@ -428,6 +428,7 @@ public class AddingEventGUI extends JPanel {
 			}
 
 			return this;
+
 		}
 
 	}

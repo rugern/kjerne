@@ -13,7 +13,6 @@ public class ServerPacketHandler {
 		ArrayList<?> params = message.getParamList();
 		CommEnum header = message.getMessageName();
 
-
 		switch(header) {
 		case LOGIN:
 			if(params.get(0) instanceof String && params.get(1) instanceof String) //ensure that proper type is kept TODO must be done for each case (e.g. in this case username and password will both obviously be strings)
@@ -69,11 +68,12 @@ public class ServerPacketHandler {
 	 * Due to an event being changed, all the affected users must be alerted. This method goes through 
 	 * the list of all threads and sends alert to those mathing the username string.
 	 * @param usersAffected
+	 * @param eventID
 	 * @param thread
 	 */
 	private static CommPack<?> handleAlertEventChanged(ArrayList<String> usersAffected, int eventID, ServerThread thread) {
 
-		//send alert to list of affected users that SOMETHING has changed!
+		//send alert to list of affected users th has changed!
 		for(String user: usersAffected) //all the users affected
 		{
 			for(ServerThread st: Server.socket.getThreads()) //all the threads

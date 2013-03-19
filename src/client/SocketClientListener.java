@@ -10,8 +10,7 @@ import server.CommPack;
 import server.ServerThread;
 
 /**
- * 
- *
+ * Listens for replies from server
  */
 public class SocketClientListener extends Thread
 {
@@ -44,26 +43,9 @@ public class SocketClientListener extends Thread
 			try {
 				CommPack reply = (CommPack) in.readObject(); 
 				System.out.println(reply.getMessageName()+" :"+reply.getParamList());
-
-				ResultSet rs = (ResultSet)reply.getParamList().get(0);
-
 				
-				try {
-					while(rs.next())
-					{
-						System.out.println(rs.getString(1));
-						System.out.println(rs.getString(2));
-						System.out.println(rs.getString(3));
-						System.out.println(rs.getString(4));
-						System.out.println(rs.getString(5));
-					}
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				//update must be handled according to what is updated in calendar
-				//TODO here
+				//test that login is handled right
+				ClientPacketHandler.handlePacket(reply);
 
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block

@@ -30,12 +30,9 @@ public class SocketClientTest {
 	 */
 	public static void sendMessageTest()
 	{
-		/*
-		ArrayList al = new ArrayList();
-		al.add("test1@testlab.org");
-		al.add(new Date(1367575200));
-		*/
-		client.sendMessage(new CommPack(CommEnum.GETROOMSANDDATE, null));		
+		ArrayList users = new ArrayList();
+		users.add("username1");
+		
+		client.sendMessage(new CommPack(CommEnum.ALERT, 23));		
 	}
-
 }
