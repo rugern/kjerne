@@ -53,7 +53,7 @@ public class ServerPacketHandler {
 		case USERNAMEALREADYTAKEN:
 			break;
 		case ALERTEVENTCHANGED:
-			handleAlertEventChanged((ArrayList) params.get(0));
+			handleAlertEventChanged((ArrayList<String>) params.get(0), (Integer) params.get(1), thread);
 			break;
 		case NEWINVITES:
 			break;
@@ -65,9 +65,25 @@ public class ServerPacketHandler {
 		return null; //TODO
 	}
 
-	private static void handleAlertEventChanged(ArrayList usersAffected) {
-		
+	/**
+	 * Due to an event being changed, all the affected users must be alerted. This method goes through 
+	 * the list of all threads and sends alert to those mathing the username string.
+	 * @param usersAffected
+	 * @param thread
+	 */
+	private static CommPack<?> handleAlertEventChanged(ArrayList<String> usersAffected, int eventID, ServerThread thread) {
+
 		//send alert to list of affected users that SOMETHING has changed!
+		for(String user: usersAffected) //all the users affected
+		{
+			for(ServerThread st: Server.socket.getThreads()) //all the threads
+			{
+				if(user.equals(st.getUser()))
+					st.Alert(eventID);
+			}
+		}
+
+		return new CommPack(CommEnum.ALERTSUCCESS, null);
 	}
 
 	private static CommPack<?> handleRoomsAndDate() {

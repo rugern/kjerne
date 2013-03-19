@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * There is one of of these threads for each user logged in, it holds the username
@@ -142,5 +143,11 @@ public class ServerThread extends Thread
 	public String getUser()
 	{
 		return user;
+	}
+	public void Alert(int eventID) {
+		// TODO Auto-generated method stub
+		ArrayList<Integer> al = new ArrayList<Integer>();
+		al.add(eventID);
+		sendMessage(new CommPack(CommEnum.ALERT, al));
 	}
 }
