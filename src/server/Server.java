@@ -13,7 +13,7 @@ public class Server {
 	final static int PORT_NUMBER = 1337; //change portnumber here
 
 	public static SocketServer socket;
-	private static ArrayList<String> loggedInUsers = new ArrayList<String>(); //Note: this is the email
+	public static ArrayList<String> loggedInUsers = new ArrayList<String>(); //Note: this is the email
 
 	public static void main(String[] args)
 	{

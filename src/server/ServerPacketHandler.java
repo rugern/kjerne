@@ -22,6 +22,8 @@ public class ServerPacketHandler {
 				return handleLogin((String)params.get(0), (String)params.get(1)); //0 = username, 1 = password
 			else System.err.println("Params casting failed! See ServerPacketHandler"); //for now, repeat this over each case too TODO
 			break;
+		case GETLATESTUSERS:
+				return new CommPack(CommEnum.LATESTUSERSRECEIVED, Server.loggedInUsers);
 		case LOGINFAILED:
 			break;
 		case GETROOMSANDDATE:

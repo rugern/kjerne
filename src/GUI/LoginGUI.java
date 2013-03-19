@@ -86,7 +86,8 @@ public class LoginGUI extends JPanel {
 				Client.sock.sendMessage(new CommPack(CommEnum.LOGIN, al));
 			}
 			
-			
+			sleep(2000); //sleep for a bit then ask server if we're logged in, eh
+			Client.sock.sendMessage(new CommPack(CommEnum.GETLATESTUSERS, null));
 		}
 	}
 

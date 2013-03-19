@@ -32,15 +32,11 @@ public class ClientPacketHandler {
 			System.out.println("Client: Login successful!");
 			handleLoginSuccessful((String)params.get(0), (String) params.get(1));
 			break;
-		case LOGINFAILED:
-			//tell GUI that pw and username wrong
-			GUI.LoginGUI.loginListener((String)params.get(0), (String) params.get(1), false);
-			break;
 		case ALERTRECEIVED:
 			System.out.println("I got an alert! Event: "+params.get(0));
 			break;
-		case GETLATESTUSERS:
-			Client.latestLoggedInUsers = params;
+		case LATESTUSERSRECEIVED:
+			Client.latestLoggedInUsers = (ArrayList<String>) params;
 		default:
 			System.err.println("Header not recognized!");
 			break;
