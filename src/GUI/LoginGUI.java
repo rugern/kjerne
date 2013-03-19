@@ -19,20 +19,25 @@ import javax.swing.SwingUtilities;
 import server.CommEnum;
 import server.CommPack;
 
+import client.Client;
 import client.SocketClient;
 
 public class LoginGUI extends JPanel {
 
 	JPanel centerPanel;
-	static JFrame loginFrame;
-	static JTextField emailTextField; //TODO maybe shouldn't be static ?
-	static JPasswordField passwordField;
-	static SocketClient client = new SocketClient("127.0.0.1", 1337);
+	public JFrame loginFrame;
+	JTextField emailTextField; //TODO maybe shouldn't be static ?
+	JPasswordField passwordField;
 
-	public static void main(String[] args) {
+	public void init() {
+		
+		if(!Client.serverUp){
+			JOptionPane.showMessageDialog(this, "Could not connect to server", "Connection Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		loginFrame = new JFrame("Logg inn");
-		loginFrame.getContentPane().add(new LoginGUI());
-		loginFrame.setVisible(true);
+		loginFrame.getContentPane().add(this);
+
 		loginFrame.setMinimumSize(new Dimension(650, 660));
 		loginFrame.setMaximumSize(new Dimension(650, 660));
 		loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -41,6 +46,8 @@ public class LoginGUI extends JPanel {
 
 	public LoginGUI() {
 
+		init();
+		
 		JLabel emailLabel = new JLabel("Email:");
 		emailTextField = new JTextField(30);
 
@@ -67,39 +74,53 @@ public class LoginGUI extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			try {
-				client.run();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			String user = emailTextField.getText();
 			String pw = passwordField.getText();
 			ArrayList<String> al = new ArrayList();
 			al.add(user);
 			al.add(pw);
-			client.sendMessage(new CommPack(CommEnum.LOGIN, al));
+			
+			//If we're connected to a server, initiate login.
+			if(Client.serverUp)
+			{
+				Client.sock.sendMessage(new CommPack(CommEnum.LOGIN, al));
+			}
+			
+			
 		}
 	}
 
-	public static void loginListener(String user, String password, boolean correctPassword)
+/*	public class LoginListener implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+
+			if(true) //TODO
+			{
+				SwingUtilities.invokeLater(new Runnable() {
+
+					@Override
+					public void run() {
+						MainProfileGUI mainProfileGUI = new MainProfileGUI();
+						mainProfileGUI.setUserEmail(emailTextField.getText());
+						String[] strigns = new String[10];
+						mainProfileGUI.main(strigns);
+					}
+				});
+
+				loginFrame.setVisible(false);
+			} else //wrong password
+				JOptionPane.showMessageDialog(null, "Feil passord!");
+		}
+	}*/
+	
+	void sleep(int sec)
 	{
-		if(correctPassword)
-		{
-			SwingUtilities.invokeLater(new Runnable() {
-
-				@Override
-				public void run() {
-					MainProfileGUI mainProfileGUI = new MainProfileGUI();
-					mainProfileGUI.setUserEmail(emailTextField.getText());
-					String[] strigns = new String[10];
-					mainProfileGUI.main(strigns);
-				}
-			});
-
-			loginFrame.setVisible(false);
-		} else //wrong password
-			JOptionPane.showMessageDialog(null, "Feil passord!");
+		try {
+			Thread.sleep(sec);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 
 }

@@ -13,7 +13,7 @@ public class SocketClientTest {
 	
 	public static void main(String[] args)
 	{
-		client = new SocketClient("127.0.0.1", 1337);
+		client = new SocketClient("192.168.0.102", 1337);
 		try {
 			client.run();
 			

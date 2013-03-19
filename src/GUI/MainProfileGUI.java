@@ -38,9 +38,10 @@ import com.toedter.calendar.JCalendar;
 import database.Query;
 import datamodell.Event;
 
+/**
+ * Tiny change, this isn't main anymore, the Client class is. [19.03.2013]
+ */
 public class MainProfileGUI extends JPanel {
-	
-	static SocketClient client;
 	
 	JFrame addingFrame = new JFrame("Ny avtale");
 	JFrame employeeCalenderFrame = new JFrame("Kalender for ansatt");
@@ -92,10 +93,9 @@ public class MainProfileGUI extends JPanel {
 	Date thisDate;
 	int thisYear;
 
-	public static void main(String[] args) {
+	public void init() {
 		JFrame profileFrame = new JFrame("Min Profil");
-		profileFrame.getContentPane().add(new MainProfileGUI());
-		profileFrame.setVisible(true);
+		profileFrame.getContentPane().add(this);
 		profileFrame.setMinimumSize(new Dimension(650, 660));
 		profileFrame.setMaximumSize(new Dimension(650, 660));
 		profileFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -104,6 +104,8 @@ public class MainProfileGUI extends JPanel {
 
 	public MainProfileGUI() {
 
+		init();
+		
 		setBackground(new Color(0xd6d5d7));
 		new BorderLayout();
 

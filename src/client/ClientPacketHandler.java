@@ -30,8 +30,7 @@ public class ClientPacketHandler {
 		case LOGINSUCCESSFUL:
 			//tell GUI that pw and username right
 			System.out.println("Client: Login successful!");
-			//handleLoginSuccessful((String)params.get(0), (String) params.get(1));
-			GUI.LoginGUI.loginListener((String)params.get(0), (String) params.get(1), true);
+			handleLoginSuccessful((String)params.get(0), (String) params.get(1));
 			break;
 		case LOGINFAILED:
 			//tell GUI that pw and username wrong
@@ -40,6 +39,8 @@ public class ClientPacketHandler {
 		case ALERTRECEIVED:
 			System.out.println("I got an alert! Event: "+params.get(0));
 			break;
+		case GETLATESTUSERS:
+			Client.latestLoggedInUsers = params;
 		default:
 			System.err.println("Header not recognized!");
 			break;
@@ -47,20 +48,11 @@ public class ClientPacketHandler {
 
 		return null; //TODO
 	}
-	
-	public static void handleLoginSuccessful(String username, String password)
-	{
-		SwingUtilities.invokeLater(new Runnable() {
 
-			@Override
-			public void run() {
-				MainProfileGUI mainProfileGUI = new MainProfileGUI();
-				mainProfileGUI.setUserEmail(emailTextField.getText());
-				String[] strigns = new String[10];
-				mainProfileGUI.main(strigns);
-			}
-		});
-
-		GUI.loginFrame.setVisible(false);
+	private static void handleLoginSuccessful(String string, String string2) {
+		// TODO Auto-generated method stub
+		SwingUtilities.invokeLater(null);
+		
 	}
+
 }

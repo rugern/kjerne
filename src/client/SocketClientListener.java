@@ -44,8 +44,8 @@ public class SocketClientListener extends Thread
 				CommPack reply = (CommPack) in.readObject(); 
 				System.out.println(reply.getMessageName()+" :"+reply.getParamList());
 				
-				//test that login is handled right
-				ClientPacketHandler.handlePacket(reply);
+				ClientPacketHandler.handlePacket(reply); //calls appropriate method according to header
+				
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
