@@ -19,7 +19,7 @@ public class ServerThread extends Thread
 	private int number;
 	private boolean stop = false;
 	private boolean loggedIn = false;
-	private String user = null; 
+	private String user = null; //this should be email
 	
 	public ServerThread(Socket socket, int threadNumber)  
 	{
@@ -138,16 +138,18 @@ public class ServerThread extends Thread
 	public void setUser(String user)
 	{
 		this.user = user;
+		loginTrue();
 	}
 	
 	public String getUser()
 	{
 		return user;
 	}
+	
 	public void Alert(int eventID) {
 		// TODO Auto-generated method stub
 		ArrayList<Integer> al = new ArrayList<Integer>();
 		al.add(eventID);
-		sendMessage(new CommPack(CommEnum.ALERT, al));
+		sendMessage(new CommPack(CommEnum.ALERTRECEIVED, al));
 	}
 }

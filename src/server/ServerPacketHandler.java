@@ -7,12 +7,15 @@ import java.util.Date;
 import datamodell.Employee;
 
 public class ServerPacketHandler {
+	
+	private static ServerThread thread;
 
-	public synchronized static CommPack<?> handlePacket(CommPack<?> message, ServerThread thread)
+	public synchronized static CommPack<?> handlePacket(CommPack<?> message, ServerThread st)
 	{
 		ArrayList<?> params = message.getParamList();
 		CommEnum header = message.getMessageName();
-
+		thread = st;
+		
 		switch(header) {
 		case LOGIN:
 			if(params.get(0) instanceof String && params.get(1) instanceof String) //ensure that proper type is kept TODO must be done for each case (e.g. in this case username and password will both obviously be strings)
@@ -57,7 +60,7 @@ public class ServerPacketHandler {
 		case NEWINVITES:
 			break;
 		default:
-			System.err.println("Header not recognized!");
+			System.err.println("Server Header "+header+" not recognized!");
 			break;
 		}
 
@@ -79,7 +82,10 @@ public class ServerPacketHandler {
 			for(ServerThread st: Server.socket.getThreads()) //all the threads
 			{
 				if(user.equals(st.getUser()))
+				{
+					System.out.println("Found a hit: "+user+" matches "+st.getUser()+" Sending alert");
 					st.Alert(eventID);
+				}
 			}
 		}
 
@@ -131,7 +137,7 @@ public class ServerPacketHandler {
 
 		if(loginSuccess) //TODO Add one more condition for not already being logged in
 		{
-			//add user to list of logged in TODO
+			thread.setUser(user);
 			return new CommPack(CommEnum.LOGINSUCCESSFUL, null);
 		}
 

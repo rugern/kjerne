@@ -31,13 +31,17 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.ListCellRenderer;
 
+import client.SocketClient;
+
 import com.toedter.calendar.JCalendar;
 
 import database.Query;
 import datamodell.Event;
 
 public class MainProfileGUI extends JPanel {
-
+	
+	static SocketClient client;
+	
 	JFrame addingFrame = new JFrame("Ny avtale");
 	JFrame employeeCalenderFrame = new JFrame("Kalender for ansatt");
 	JFrame changingFrame = new JFrame("Endre avtale");
