@@ -56,6 +56,65 @@ public class Query {
 
 		return resultSet;
 	}
+	
+	public ArrayList<Event> getSentInvitations() throws SQLException{
+		
+		
+		
+		
+		
+		
+		
+		PreparedStatement preparedStatement = (PreparedStatement) conn.connection.prepareStatement("SELECT DISTINCT Event.EventID, Event.Email, StartTime, EndTime, StartDate, EndDate, Description, Place, State, Title, MeetingOrEvent, Roomnr, weekNR FROM Event JOIN Participant WHERE Event.EventID = Participant.EventID AND Participant.Email = ? AND Answer = NULL ");
+	
+		resultSet = preparedStatement.executeQuery();
+		
+		ArrayList<Event> sentInvitationsList = new ArrayList<Event>();
+		
+		while(resultSet.next()){
+			
+			int eventID = resultSet.getInt("EventID");
+			String adminEmail = resultSet.getString("Event.Email");
+			String startTime = resultSet.getString("StartTime");
+			String endTime = resultSet.getString("EndTime");
+			String startingDate = resultSet.getString("StartDate");
+			String endDate = resultSet.getString("EndDate");
+			String description = resultSet.getString("Description");
+			String place = resultSet.getString("Place");
+			String state = resultSet.getString("State");
+			String title = resultSet.getString("Title");
+			String meetingOrEvent = resultSet.getString("MeetingOrEvent");
+			int roomNr = resultSet.getInt("RoomNR");
+			int weeknr = resultSet.getInt("weekNR");
+			
+			PreparedStatement preparedStatement2 = (PreparedStatement) conn.connection.prepareStatement("SELECT Email, Name from Particpant Join Employee WHERE Employee.Email = Participant.Email AND EventID = ?");
+			
+			preparedStatement2.setInt(1, eventID);
+			
+			ResultSet resultSet2 = preparedStatement2.executeQuery();
+			
+			ArrayList<EventMaker> employeeList = new ArrayList<EventMaker>();
+			
+			while (resultSet2.next()) {
+				
+				String email = resultSet2.getString("Email");
+				String name = resultSet2.getString("Name");
+				
+				employeeList.add(new Employee(email,name));
+				
+				System.out.println("MAIl " + email  + " Name " + name);
+				
+			}
+			
+			sentInvitationsList.add(new Event(eventID, adminEmail, startingDate,
+					endDate, startTime, endTime, place, description, title,
+					employeeList, EventTypes.meeting, roomNr, weeknr));
+			
+		}
+		
+		System.out.println(sentInvitationsList.size());
+		return sentInvitationsList;
+	}
 
 	public ArrayList<Employee> getEmployees() throws SQLException {
 
@@ -109,7 +168,6 @@ public class Query {
 
 		while (resultSet.next()) {
 			id = resultSet.getInt(1);
-			System.out.println(id);
 			
 		}
 

@@ -78,6 +78,7 @@ public class MainProfileGUI extends JPanel {
 
 	DefaultListModel weekModel;
 	DefaultListModel todaysEventModel;
+	DefaultListModel sentRequestModel;
 
 	ArrayList<Event> todaysEventsList;
 	ArrayList<Event> weekEvents;
@@ -149,8 +150,26 @@ public class MainProfileGUI extends JPanel {
 		sentRequest = new JPanel();
 		sentRequest.setPreferredSize(new Dimension(300, 250));
 		sentRequest.setBackground(Color.WHITE);
+		
+		
+		
+		sentRequestModel = new DefaultListModel();
+		try {
+			ArrayList<Event> sentRequestsList = new Query().getSentInvitations();
+			
+			for (int i = 0; i < sentRequestsList.size(); i++) {
+				sentRequestModel.addElement(sentRequestsList.get(i));
+				
+			}
+			
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
 
-		sentRequestList = new JList(testModel);
+		sentRequestList = new JList(sentRequestModel);
 		sentRequestList.setFixedCellHeight(30);
 		sentRequestList.setCellRenderer(new EventRenderer());
 		sentRequestList.addMouseListener(new EventInfo());
