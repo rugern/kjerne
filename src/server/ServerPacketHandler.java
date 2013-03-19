@@ -52,7 +52,8 @@ public class ServerPacketHandler {
 			break;
 		case USERNAMEALREADYTAKEN:
 			break;
-		case ALERT:
+		case ALERTEVENTCHANGED:
+			handleAlertEventChanged((ArrayList) params.get(0));
 			break;
 		case NEWINVITES:
 			break;
@@ -62,6 +63,11 @@ public class ServerPacketHandler {
 		}
 
 		return null; //TODO
+	}
+
+	private static void handleAlertEventChanged(ArrayList usersAffected) {
+		
+		//send alert to list of affected users that SOMETHING has changed!
 	}
 
 	private static CommPack<?> handleRoomsAndDate() {
