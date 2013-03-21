@@ -79,12 +79,11 @@ public class ServerPacketHandler {
 		return null; //TODO
 	}
 
-	private static CommPack<?> handleUpdateEvent(ArrayList<> params) {
+	private static CommPack<?> handleUpdateEvent(ArrayList params) {
 		
 		//TODO
 		System.out.println("Handling updateEvent!");
-		database.DBAccess.updateEvent(params.get(0)
-				params.get(0),
+		database.DBAccess.updateEvent(params.get(0),
 				params.get(1),
 				params.get(2),
 				params.get(3),
@@ -95,7 +94,7 @@ public class ServerPacketHandler {
 				params.get(8),
 				params.get(9),
 				params.get(10),
-				params.get(11),
+				params.get(11)
 				);
 		
 		return new CommPack(CommEnum.EVENTUPDATED, null);

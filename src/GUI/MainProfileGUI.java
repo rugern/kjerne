@@ -527,6 +527,7 @@ public class MainProfileGUI extends JPanel {
 			al.add(roomNr);
 			al.add(event.getID());
 			al.add(weekNr);
+			ArrayList<Object> wrap = new ArrayList<Object>();
 			Client.sock.sendMessage(new CommPack(CommEnum.UPDATEEVENT, al));
 		}
 	}
