@@ -49,19 +49,11 @@ public class Client {
 		Client.email = email;
 		System.out.println("Setting login frame invisible");
 		login.loginFrame.setVisible(false);
-		mainGui = new MainProfileGUI();
-		mainGui.requestInviteEventList();
-		mainGui.requestReceivedEventList();
-		//sleep();
+		mainGui.main(null);
 	}
 	
-	static void sleep()
+	public static void close()
 	{
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		sock.close();
 	}
 }

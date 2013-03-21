@@ -37,20 +37,9 @@ public class ClientPacketHandler {
 		case ALREADYLOGGEDIN:
 			System.out.println("You're already logged in!");
 			break;
-		case INVITATIONLIST:
-			System.out.println("Invitation list received!");
-			Client.latestPack = message;
-			System.out.println("Setting latest pack = "+message);
-			Client.mainGui.setInviteEventList(); //TODO this will cause trouble if this header is called after startup, consider creating a different header
-			break;
-		case RECEIVEDLIST:
-			System.out.println("RECEIVEDLIST recieved!");
-			Client.latestPack = message;
-			System.out.println("Setting latest pack = "+message);
-			Client.mainGui.setRecievedEventList();
-			break;
 		case ALERTRECEIVED:
 			System.out.println("I got an alert! Event: "+params.get(0)); //TODO
+			Client.mainGui.eventChangedAlert((Integer)params.get(0)); //eventID
 			break;
 		default:
 			System.err.println("Header not recognized!");

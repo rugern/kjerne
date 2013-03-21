@@ -13,6 +13,11 @@ import java.util.Date;
 
 import javax.xml.ws.handler.MessageContext.Scope;
 
+import server.CommEnum;
+import server.CommPack;
+
+import client.Client;
+
 import com.mysql.jdbc.PreparedStatement;
 import datamodell.*;
 
@@ -258,6 +263,11 @@ public class Query {
 		preparedStatement.setInt(10, weekNR);
 		preparedStatement.setInt(11, eventID);
 
+		//alert people that this event has been changed
+		ArrayList al = new ArrayList(); 
+		al.add(eventID);
+		Client.sock.sendMessage(new CommPack(CommEnum.ALERTEVENTCHANGED, al));
+		
 		preparedStatement.executeUpdate();
 	}
 
