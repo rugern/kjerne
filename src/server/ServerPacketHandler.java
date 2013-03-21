@@ -30,6 +30,8 @@ public class ServerPacketHandler {
 		case ALERTEVENTINVITE:
 			handleAlertEventInvite((ArrayList<String>) params.get(0));
 			break;
+//		case DELETEEVENT:
+//			handleDeleteEvent((Integer)params.get(0));
 		default:
 			System.err.println("Server Header "+header+" not recognized!");
 			break;
@@ -38,6 +40,24 @@ public class ServerPacketHandler {
 		return null; //TODO
 	}
 
+/*
+	private static void handleDeleteEvent(Integer integer) {
+		
+		for(String user: usersAffected) //all the users affected
+		{
+			for(ServerThread st: Server.socket.getThreads()) //all the threads
+			{
+				if(user.equals(st.getUser()))
+				{
+					System.out.println("Found a hit: "+user+" matches "+st.getUser()+" Sending alert");
+					st.Alert(eventID);
+				}
+			}
+		}
+
+		return new CommPack(CommEnum.ALERTSUCCESS, null);
+	}
+*/
 
 	/**
 	 * Due to an event being changed, all the affected users must be alerted. This method goes through 
