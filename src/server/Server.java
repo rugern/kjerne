@@ -46,4 +46,14 @@ public class Server {
 	{
 		loggedInUsers.remove(st.getUser());
 	}
+	
+	public static boolean isUserLoggedOn(String user)
+	{
+		for(String u: loggedInUsers)
+		{
+			if(u.equals(user))
+				return true;
+		}
+		return false;
+	}
 }

@@ -74,8 +74,8 @@ public class LoginGUI extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 
-			String user = emailTextField.getText();
-			String pw = passwordField.getText();
+			String user = "test1@testlab.org";//emailTextField.getText(); TODO uncomment
+			String pw = "user1";// passwordField.getText(); TODO uncomment
 			ArrayList<String> al = new ArrayList();
 			al.add(user);
 			al.add(pw);
@@ -84,10 +84,13 @@ public class LoginGUI extends JPanel {
 			if(Client.serverUp)
 			{
 				Client.sock.sendMessage(new CommPack(CommEnum.LOGIN, al));
+				sleep(2000); //sleep for a bit then ask server if we're logged in, eh
 			}
 			
-			sleep(2000); //sleep for a bit then ask server if we're logged in, eh
-			Client.sock.sendMessage(new CommPack(CommEnum.GETLATESTUSERS, null));
+			if(Client.loggedOn == false)
+			{
+				JOptionPane.showMessageDialog(null, "Check username and password!");
+			}
 		}
 	}
 

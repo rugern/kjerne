@@ -17,7 +17,6 @@ import datamodell.Employee;
  * Handles the replies the client gets from server appropriately. Similar to serverpackethandler
  * but lite.
  * @author Jama
- *
  */
 public class ClientPacketHandler {
 
@@ -28,15 +27,31 @@ public class ClientPacketHandler {
 
 		switch(header) {
 		case LOGINSUCCESSFUL:
-			//tell GUI that pw and username right
-			System.out.println("Client: Login successful!");
-			handleLoginSuccessful((String)params.get(0), (String) params.get(1));
+			System.out.println("Login successful!");
+			Client.loggedOn((String) params.get(0));
+			break;
+		case LOGINFAILED: 
+			System.out.println("Login failed!");
+			Client.loggedOn = false;
+			break;
+		case ALREADYLOGGEDIN:
+			System.out.println("You're already logged in!");
+			break;
+		case INVITATIONLIST:
+			System.out.println("Invitation list received!");
+			Client.latestPack = message;
+			System.out.println("Setting latest pack = "+message);
+			Client.mainGui.setInviteEventList(); //TODO this will cause trouble if this header is called after startup, consider creating a different header
+			break;
+		case RECEIVEDLIST:
+			System.out.println("RECEIVEDLIST recieved!");
+			Client.latestPack = message;
+			System.out.println("Setting latest pack = "+message);
+			Client.mainGui.setRecievedEventList();
 			break;
 		case ALERTRECEIVED:
-			System.out.println("I got an alert! Event: "+params.get(0));
+			System.out.println("I got an alert! Event: "+params.get(0)); //TODO
 			break;
-		case LATESTUSERSRECEIVED:
-			Client.latestLoggedInUsers = (ArrayList<String>) params;
 		default:
 			System.err.println("Header not recognized!");
 			break;
@@ -45,10 +60,5 @@ public class ClientPacketHandler {
 		return null; //TODO
 	}
 
-	private static void handleLoginSuccessful(String string, String string2) {
-		// TODO Auto-generated method stub
-		SwingUtilities.invokeLater(null);
-		
-	}
 
 }

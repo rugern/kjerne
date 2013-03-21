@@ -29,5 +29,9 @@ public class CommPack<T> implements Serializable
 	public ArrayList<?> getParamList() {
 		return paramList;
 	}
+	
+	public String toString() {
+		return messageName.name() + ": "+paramList;
+	}
 
 }

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
+import server.CommPack;
+
 import GUI.LoginGUI;
 import GUI.MainProfileGUI;
 
@@ -15,8 +17,11 @@ public class Client {
 	public static SocketClient sock;
 	
 	public static boolean loggedOn = false;
+	public static String email;
 	public static boolean serverUp;
 	public static ArrayList<String> latestLoggedInUsers;
+	public static CommPack<?> latestPack;
+	public static ClientPacketHandler cph;
 	
 	public static void main(String[] args) {
 		
@@ -33,11 +38,30 @@ public class Client {
 			
 			public void run() {
 				login = new LoginGUI();
-				mainGui = new MainProfileGUI();
 				if(!serverUp) return; //exit completely if server not up
 				login.loginFrame.setVisible(true);
 			}
 		});
 	}
-
+	
+	public static void loggedOn(String email) {
+		Client.loggedOn = true;
+		Client.email = email;
+		System.out.println("Setting login frame invisible");
+		login.loginFrame.setVisible(false);
+		mainGui = new MainProfileGUI();
+		mainGui.requestInviteEventList();
+		mainGui.requestReceivedEventList();
+		//sleep();
+	}
+	
+	static void sleep()
+	{
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

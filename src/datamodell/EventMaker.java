@@ -1,6 +1,7 @@
 package datamodell;
 
 import java.awt.print.Printable;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ import client.SocketClient;
  * Note: consider changing name of class to something less ambiguous
  * @author Jama
  */
-public abstract class EventMaker {
+public abstract class EventMaker implements Serializable {
 	
 	private String email;
 	private String name;
@@ -25,14 +26,11 @@ public abstract class EventMaker {
 	private List<Event> events; //list of events this user is connected to
 	private List<Event> invitations; //TODO ensure accept and decline is handled
 	private List<String> deletes; //A quick toString of an event right before deletion ensures that the user knows what has been deleted, once user is notified, delete the string from this list as well.
-//	private SocketClient socket = new SocketClient(server, port); //TODO
 	
 	public EventMaker(String email, String name) {
 		this.setEmail(email);
 		this.setName(name);
-	
 	}
-	
 	
 	public void setName(String name){
 		this.name = name;
@@ -103,21 +101,6 @@ public abstract class EventMaker {
 //			socket.changeEventQuery(event); //Change event in database
 //		}
 //	}
-	
-	/**
-	 * 
-	 * @param The event to be deleted
-	 * @throws Exception if this eventmaker is not admin of event. Therefore cannot delete
-	 */
-	public void deleteEvent(Event event) throws Exception {
-		
-		if(email != event.getAdminEmail()) throw new Exception("Cannot delete, user is not administrator");
-		else if(events.contains(event))//user is admin and event is in his list
-		{
-			event.notifyDelete(); //tells everyone subscribing to event to delete it
-//			socket.deleteEventQuery(event.getID()); //Delete event from database
-		}
-	}
 	
 	//Get this.calendar or coworkers calendar, specified by EventMaker's email
 //	public ArrayList<Event> getDataBaseCalendar(String email) {

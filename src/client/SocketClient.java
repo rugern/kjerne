@@ -24,6 +24,8 @@ public class SocketClient {
 	String servName;
 	int port;
 	SocketClientListener socketClientListener;
+	
+	private CommPack latest;
 
 	public SocketClient(String server, int port) 
 	{
@@ -47,7 +49,6 @@ public class SocketClient {
 			//setup listener so that server can send updates to client
 			socketClientListener = new SocketClientListener(in);
 			socketClientListener.start();
-
 		}
 		catch(UnknownHostException e)
 		{
@@ -66,14 +67,12 @@ public class SocketClient {
 		{
 			out.writeObject(o);
 			out.flush();
-			System.out.println("client>" + o.getMessageName());
+			System.out.println("FromClientPack>" + o);
 		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
-		}
-
-		//ClientUnpacker.unpackClientMessage(socketClientListener.getLatestMessage());
+		}		
 	}
 
 	public void close()
@@ -89,5 +88,6 @@ public class SocketClient {
 			e.printStackTrace();
 		}
 	}
+
 
 }

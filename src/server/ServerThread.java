@@ -87,7 +87,7 @@ public class ServerThread extends Thread
 		{
 			out.writeObject(msg);
 			out.flush();
-			System.out.println("client>" + msg.getMessageName());
+			System.out.println("FromServerPack>" + msg.getMessageName());
 		}
 		catch (IOException e)
 		{

@@ -1,6 +1,8 @@
 package datamodell;
 
 import GUI.*;
+
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,7 @@ import GUI.EventTypes;
  * @author Rugern
  * 
  */
-public class Event {
+public class Event implements Serializable {
 
 	private int ID;
 	private String startDate; // Date also has hours and minutes, so we'll make
@@ -93,48 +95,6 @@ public class Event {
 		}
 		
 		//socket.createEventQuery(adminEmail, startDate, endDate, locale, description, title, participants, eventTypes);
-	}
-
-	/**
-	 * Invitation to event is sent to following list of employees
-	 */
-	public void eventInvitation() {
-		for (EventMaker e : participants) {
-			e.inviteToEvent(this);
-		}
-	}
-
-	/**
-	 * Notifies participants that the event has been deleted
-	 */
-	public void notifyDelete() {
-		for (EventMaker e : participants) {
-			e.notifyDeleteEvent(this);
-		}
-	}
-
-	/**
-	 * Add list of participants to event
-	 * 
-	 * @param List
-	 *            participants
-	 */
-	public void addListParticipants(ArrayList<EventMaker> participants) {
-		participants.addAll(participants); // Adds participants to
-											// this.participants field
-		for (EventMaker e : participants) {
-			// socket.addParticipantQuery(e); //Adds participants in database
-		}
-	}
-
-	// Remove list of participants from event
-	public void removeParticipants(ArrayList<EventMaker> participants) {
-		participants.removeAll(participants); // Removes participants in
-												// this.participants field
-		for (EventMaker e : participants) {
-			// socket.removeParticipantsQuery(e); //Removes participants in
-			// database
-		}
 	}
 
 	// Only getters and setters from here and down
