@@ -231,7 +231,6 @@ public class Query {
 
 		while (resultSet.next()) {
 			id = resultSet.getInt(1);
-
 		}
 
 		preparedStatement2.setInt(1, id);
@@ -286,9 +285,7 @@ public class Query {
 
 			locales.add(new Locale(id, capacity));
 		}
-
 		return locales;
-
 	}
 
 	// Use own email if you want events associated with yourself, use

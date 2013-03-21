@@ -24,6 +24,8 @@ public class ClientPacketHandler {
 	{
 		ArrayList<?> params = message.getParamList();
 		CommEnum header = message.getMessageName();
+		
+		Client.latestPack = message;
 
 		switch(header) {
 		case LOGINSUCCESSFUL:

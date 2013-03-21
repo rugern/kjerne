@@ -64,13 +64,13 @@ public class ServerPacketHandler {
 	 * Checks if username and password exists in database, and if they're not already logged in
 	 * @param email The email is the login field
 	 * @param password
-	 * @return CommPack with header LOGINFAILED or LOGINSUCCESSFUL
+	 * @return CommPack with header LOGINFAILED/ALREADYLOGGEDIN or LOGINSUCCESSFUL
 	 */
 	private static CommPack<?> handleLogin(String email, String password) {
 
-		Boolean loginSuccess = database.DBAccess.validateLogin(email, password);
+		Boolean correctUser = database.DBAccess.validateLogin(email, password);
 
-		if(loginSuccess)
+		if(correctUser)
 		{
 			if(!Server.isUserLoggedOn(email)) {
 				thread.setUser(email);

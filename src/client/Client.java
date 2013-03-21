@@ -21,7 +21,6 @@ public class Client {
 	public static boolean serverUp;
 	public static ArrayList<String> latestLoggedInUsers;
 	public static CommPack<?> latestPack;
-	public static ClientPacketHandler cph;
 	
 	public static void main(String[] args) {
 		
