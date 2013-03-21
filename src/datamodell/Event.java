@@ -1,8 +1,6 @@
 package datamodell;
 
 import GUI.*;
-
-import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +23,7 @@ import GUI.EventTypes;
  * @author Rugern
  * 
  */
-public class Event implements Serializable {
+public class Event {
 
 	private int ID;
 	private String startDate; // Date also has hours and minutes, so we'll make
@@ -37,6 +35,7 @@ public class Event implements Serializable {
 	private String startTime;
 	private String endTime;
 	private int weekNr;
+	private int answer;
 	private int roomNr;
 	private ArrayList<EventMaker> participants; // Holds all participants in
 												// event, for easy notification
@@ -49,7 +48,9 @@ public class Event implements Serializable {
 	// private SocketClient socket = new SocketClient(server, port); //TODO
 
 	// Constructor
-	public Event(int ID, String adminEmail, String startDate, String endDate, String startTime, String endTime,String place, String description, String title, ArrayList<EventMaker> participants,
+	public Event(int ID, String adminEmail, String startDate, String endDate,
+			String startTime, String endTime, String place, String description,
+			String title, ArrayList<EventMaker> participants,
 			EventTypes eventTypes, int roomNr, int weekNR) {
 		this.ID = ID;
 		this.adminEmail = adminEmail;
@@ -58,7 +59,7 @@ public class Event implements Serializable {
 		this.place = place;
 		this.roomNr = roomNr;
 		this.startTime = startTime;
-		this.endTime = endTime; 
+		this.endTime = endTime;
 		this.description = description;
 		this.title = title;
 		this.participants = participants;
@@ -66,15 +67,20 @@ public class Event implements Serializable {
 		this.participants = participants;
 		this.setEventTypes(eventTypes);
 		try {
-			new database.Query().addEventToDatabase(title, adminEmail, ID, startTime, endTime, startDate, endDate, description, place, eventTypes,  roomNr, weekNR, participants);
+			new database.Query().addEventToDatabase(title, adminEmail, ID,
+					startTime, endTime, startDate, endDate, description, place,
+					eventTypes, roomNr, weekNR, participants);
 		} catch (SQLException e) {
 		}
-		
-		//socket.createEventQuery(adminEmail, startDate, endDate, locale, description, title, participants, eventTypes);
+
+		// socket.createEventQuery(adminEmail, startDate, endDate, locale,
+		// description, title, participants, eventTypes);
 	}
-	
-	//Constructor without setting EventID - has to be set by the database
-	public Event(String adminEmail, String startDate, String endDate, String startTime, String endTime,String place, String description, String title, ArrayList<EventMaker> participants,
+
+	// Constructor without setting EventID - has to be set by the database
+	public Event(String adminEmail, String startDate, String endDate,
+			String startTime, String endTime, String place, String description,
+			String title, ArrayList<EventMaker> participants,
 			EventTypes eventTypes, int roomNr, int weekNR) {
 		this.adminEmail = adminEmail;
 		this.startDate = startDate;
@@ -82,19 +88,85 @@ public class Event implements Serializable {
 		this.place = place;
 		this.roomNr = roomNr;
 		this.startTime = startTime;
-		this.endTime = endTime; 
+		this.endTime = endTime;
 		this.description = description;
 		this.title = title;
 		this.weekNr = weekNR;
 		this.participants = participants;
 		this.setEventTypes(eventTypes);
 		try {
-			new database.Query().addEventToDatabase(title, adminEmail, ID, startTime, endTime, startDate, endDate, description, place, eventTypes,  roomNr, weekNR, participants);
+			new database.Query().addEventToDatabase(title, adminEmail, ID,
+					startTime, endTime, startDate, endDate, description, place,
+					eventTypes, roomNr, weekNR, participants);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-		//socket.createEventQuery(adminEmail, startDate, endDate, locale, description, title, participants, eventTypes);
+
+		// socket.createEventQuery(adminEmail, startDate, endDate, locale,
+		// description, title, participants, eventTypes);
+	}
+
+	public Event(int ID, String adminEmail, String startDate, String endDate,
+			String startTime, String endTime, String place, String description,
+			String title, ArrayList<EventMaker> participants,
+			EventTypes eventTypes, int roomNr, int weekNR, int answer) {
+		this.ID = ID;
+		this.adminEmail = adminEmail;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.place = place;
+		this.roomNr = roomNr;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.description = description;
+		this.title = title;
+		this.participants = participants;
+		this.weekNr = weekNR;
+		this.participants = participants;
+		this.setEventTypes(eventTypes);
+		this.answer = answer;
+	}
+
+	/**
+	 * Invitation to event is sent to following list of employees
+	 */
+	public void eventInvitation() {
+		for (EventMaker e : participants) {
+			e.inviteToEvent(this);
+		}
+	}
+
+	/**
+	 * Notifies participants that the event has been deleted
+	 */
+	public void notifyDelete() {
+		for (EventMaker e : participants) {
+			e.notifyDeleteEvent(this);
+		}
+	}
+
+	/**
+	 * Add list of participants to event
+	 * 
+	 * @param List
+	 *            participants
+	 */
+	public void addListParticipants(ArrayList<EventMaker> participants) {
+		participants.addAll(participants); // Adds participants to
+											// this.participants field
+		for (EventMaker e : participants) {
+			// socket.addParticipantQuery(e); //Adds participants in database
+		}
+	}
+
+	// Remove list of participants from event
+	public void removeParticipants(ArrayList<EventMaker> participants) {
+		participants.removeAll(participants); // Removes participants in
+												// this.participants field
+		for (EventMaker e : participants) {
+			// socket.removeParticipantsQuery(e); //Removes participants in
+			// database
+		}
 	}
 
 	// Only getters and setters from here and down
@@ -162,8 +234,8 @@ public class Event implements Serializable {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
-	public int getRoomNR(){
+
+	public int getRoomNR() {
 		return this.roomNr;
 	}
 
@@ -185,5 +257,9 @@ public class Event implements Serializable {
 
 	public void setEventTypes(EventTypes eventTypes) {
 		this.eventTypes = eventTypes;
+	}
+	
+	public int getAnswer(){
+		return this.answer;
 	}
 }

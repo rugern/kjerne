@@ -17,6 +17,7 @@ public class Conn {
 	public Conn(){
 
 		try {
+			
 			Class.forName("com.mysql.jdbc.Driver");
 
 			connection = DriverManager.getConnection(
@@ -29,8 +30,21 @@ public class Conn {
 		}
 
 		// connection = DriverManager.getConnection(
-		// "jdbc:mysql://localhost:3306/fellesprosjekt",
+		// "jdbc:mysql://mysql.stud.ntnu.no:3306/nilsiru_felles",
 		// "nilsiru_gruppe11@cura.itea.ntnu.no", "felles");
+
+	}
+
+	public static void main(String args[]) throws SQLException {
+
+//		Query query = new Query();
+
+//		query.addEvent("test", "testing@gmail.com", null, null,
+//				null, "hydro", null, (Integer) null);
+		
+//		System.out.println("entered");
+
+//		query.getEventByDate("@gmail.com", "2013mar01");
 
 	}
 

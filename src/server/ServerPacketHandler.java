@@ -27,6 +27,9 @@ public class ServerPacketHandler {
 		case ALERTEVENTCHANGED:
 			handleAlertEventChanged((ArrayList<String>) params.get(0), (Integer) params.get(1));
 			break;
+		case ALERTEVENTINVITE:
+			handleAlertEventInvite((ArrayList<String>) params.get(0));
+			break;
 		default:
 			System.err.println("Server Header "+header+" not recognized!");
 			break;
@@ -59,6 +62,27 @@ public class ServerPacketHandler {
 
 		return new CommPack(CommEnum.ALERTSUCCESS, null);
 	}
+	
+	private static CommPack<?> handleAlertEventInvite(ArrayList<String> usersAffected) {
+
+		//send alert to list of affected users th has changed!
+		for(String user: usersAffected) //all the users affected
+		{
+			for(ServerThread st: Server.socket.getThreads()) //all the threads
+			{
+				if(user.equals(st.getUser()))
+				{
+					System.out.println("Found a hit: "+user+" matches "+st.getUser()+" Sending alert");
+					st.inviteAlert();
+				}
+			}
+		}
+
+		return new CommPack(CommEnum.ALERTSUCCESS, null);
+	}
+	
+	
+	
 
 	/**
 	 * Checks if username and password exists in database, and if they're not already logged in

@@ -41,7 +41,10 @@ public class ClientPacketHandler {
 			break;
 		case ALERTRECEIVED:
 			System.out.println("I got an alert! Event: "+params.get(0)); //TODO
-			Client.mainGui.eventChangedAlert((Integer)params.get(0)); //eventID
+			MainProfileGUI.eventChangedAlert((Integer)params.get(0)); //eventID
+			break;
+		case INVITEALERTRECIEVED:
+			MainProfileGUI.inviteAlert();
 			break;
 		default:
 			System.err.println("Header not recognized!");

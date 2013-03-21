@@ -48,7 +48,7 @@ public class Client {
 		Client.email = email;
 		System.out.println("Setting login frame invisible");
 		login.loginFrame.setVisible(false);
-		mainGui.main(null);
+		mainGui.main(email);
 	}
 	
 	public static void close()

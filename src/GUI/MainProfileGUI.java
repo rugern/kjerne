@@ -12,6 +12,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Array;
+import java.net.URL;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -21,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -30,6 +33,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.ListCellRenderer;
+
+import server.CommEnum;
+import server.CommPack;
 
 import client.Client;
 
@@ -66,33 +72,45 @@ public class MainProfileGUI extends JPanel {
 	JPanel receivedRequest;
 	JPanel sentRequest;
 
+	ImageIcon greenIcon = new ImageIcon(getClass().getResource(
+			"/resources/ball_green_small.png"));
+	ImageIcon redIcon = new ImageIcon(getClass().getResource(
+			"/resources/ball_red_small.png"));
+	ImageIcon grayIcon = new ImageIcon(getClass().getResource(
+			"/resources/ball_gray_small.png"));
+
 	AddingEventGUI addingEventGUI = new AddingEventGUI();
 	EmployeeCalenderGUI employeeCalenderGUI = new EmployeeCalenderGUI();
-	ChangeEventGUI changeEventGUI = new ChangeEventGUI();
+	changeEventGUI changeEventGUI = new changeEventGUI();
 
 	DateToStringModifier dtsm;
 
-	JCalendar cal;
+	static JCalendar cal;
 	JList chosenDayEventList;
 	JList weekEventsList;
 	JList receivedRequestList;
 	JList sentRequestList;
 	JLabel chosenDayEvent;
 
-	DefaultListModel weekModel;
-	DefaultListModel todaysEventModel;
-	DefaultListModel recievedRequestModel;
-	DefaultListModel sentRequestModel;
+	static DefaultListModel weekModel;
+	static DefaultListModel todaysEventModel;
+	static DefaultListModel recievedRequestModel;
+	static DefaultListModel sentRequestModel;
 
-	ArrayList<Event> todaysEventsList;
-	ArrayList<Event> weekEvents;
+	static ArrayList<Event> todaysEventsList;
+	static ArrayList<Event> weekEvents;
+	static ArrayList<Event> sentRequestListFromQuery;
+	static ArrayList<Event> recievedRequestsListFromQuery;
 
-	Date thisDate;
-	int thisYear;
+	static Date thisDate;
+	static int thisYear;
+	static String userEmail = Client.email;
 
-	public static void main(String[] args) {
+	public static void main(String args) {
 		JFrame profileFrame = new JFrame("Min Profil");
-		profileFrame.getContentPane().add(new MainProfileGUI());
+		MainProfileGUI mainProfileGUI = new MainProfileGUI();
+		userEmail = args;
+		profileFrame.getContentPane().add(mainProfileGUI);
 		profileFrame.setVisible(true);
 		profileFrame.setMinimumSize(new Dimension(650, 660));
 		profileFrame.setMaximumSize(new Dimension(650, 660));
@@ -101,7 +119,6 @@ public class MainProfileGUI extends JPanel {
 	}
 
 	public MainProfileGUI() {
-
 		setBackground(new Color(0xd6d5d7));
 		new BorderLayout();
 
@@ -111,7 +128,6 @@ public class MainProfileGUI extends JPanel {
 
 		thisDate = cal.getDate();
 		thisYear = cal.getDate().getYear();
-
 
 		// WestNorthLowerPanel
 		JButton addEventButton = new JButton("Ny hendelse");
@@ -132,12 +148,14 @@ public class MainProfileGUI extends JPanel {
 		// Requests
 		recievedRequestModel = new DefaultListModel();
 		try {
-			ArrayList<Event> sentRequestsList = new Query().getRecievedInvitations(Client.email);
-			
-			for (int i = 0; i < sentRequestsList.size(); i++) {
-				recievedRequestModel.addElement(sentRequestsList.get(i));
+			recievedRequestsListFromQuery = new Query()
+					.getRecievedInvitations(userEmail);
+
+			for (int i = 0; i < recievedRequestsListFromQuery.size(); i++) {
+				recievedRequestModel.addElement(recievedRequestsListFromQuery
+						.get(i));
 			}
-			
+
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -148,7 +166,7 @@ public class MainProfileGUI extends JPanel {
 
 		receivedRequestList = new JList(recievedRequestModel);
 		receivedRequestList.setFixedCellHeight(30);
-		receivedRequestList.setCellRenderer(new EventRenderer());
+		receivedRequestList.setCellRenderer(new EventRendererWithLogo());
 		receivedRequestList.addMouseListener(new EventInfo());
 
 		JScrollPane receivedRequestScrollPane = new JScrollPane(
@@ -162,25 +180,24 @@ public class MainProfileGUI extends JPanel {
 
 		receivedRequest.add(receivedRequestScrollPane, BorderLayout.SOUTH);
 
-
 		sentRequest = new JPanel();
 		sentRequest.setPreferredSize(new Dimension(300, 250));
 		sentRequest.setBackground(Color.WHITE);
-		
+
 		sentRequestModel = new DefaultListModel();
-		
-		ArrayList<Event> sentRequestListFromQuery;
+
 		try {
-			sentRequestListFromQuery = new Query().getSentInvitations(Client.email);
+			sentRequestListFromQuery = new Query()
+					.getSentInvitations(userEmail);
 			for (int i = 0; i < sentRequestListFromQuery.size(); i++) {
 				sentRequestModel.addElement(sentRequestListFromQuery.get(i));
-				
+
 			}
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		sentRequestList = new JList(sentRequestModel);
 		sentRequestList.setFixedCellHeight(30);
 		sentRequestList.setCellRenderer(new EventRenderer());
@@ -231,11 +248,10 @@ public class MainProfileGUI extends JPanel {
 		westSouthLowerPanel.setBackground(Color.WHITE);
 
 		try {
-			weekEvents = new Query().getThisWeeksEvents(Client.email,
+			weekEvents = new Query().getThisWeeksEvents(userEmail,
 					cal.getDate(), cal.getDate().getYear());
 
 			weekModel = new DefaultListModel();
-			weekModel.addElement(new String());
 
 			for (int i = 0; i < weekEvents.size(); i++) {
 				weekModel.addElement(weekEvents.get(i));
@@ -400,12 +416,132 @@ public class MainProfileGUI extends JPanel {
 		return months.get(monthInt);
 	}
 
-	
-	public void eventChangedAlert(Integer eventID){
-		
-		JOptionPane.showMessageDialog(null, "Event "+eventID+" har blitt endret"); //TODO, make it show the date
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
+	}
+
+	public String getUserEmail() {
+		return this.userEmail;
+	}
+
+	public void UpdateMethod() throws ParseException, SQLException {
+
+		todaysEventModel.clear();
+
+		todaysEventsList = new Query().getEventByDate(userEmail, cal.getDate(),
+				cal.getDate().getYear());
+
+		for (int i = 0; i < todaysEventsList.size(); i++) {
+			todaysEventModel.addElement(todaysEventsList.get(i));
+		}
+
+		weekModel.clear();
+
+		weekEvents = new Query().getThisWeeksEvents(userEmail, thisDate,
+				thisYear);
+
+		for (int j = 0; j < weekEvents.size(); j++) {
+			weekModel.addElement(weekEvents.get(j));
+
+		}
+
+		sentRequestModel.clear();
+
+		sentRequestListFromQuery = new Query().getSentInvitations(userEmail);
+
+		for (int i = 0; i < sentRequestListFromQuery.size(); i++) {
+			sentRequestModel.addElement(sentRequestListFromQuery.get(i));
+
+		}
+
+		recievedRequestModel.clear();
+
+		recievedRequestsListFromQuery = new Query()
+				.getRecievedInvitations(userEmail);
+
+		for (int i = 0; i < recievedRequestsListFromQuery.size(); i++) {
+			recievedRequestModel.addElement(recievedRequestsListFromQuery
+					.get(i));
+		}
+	}
+
+	public static void updateMethod() throws ParseException, SQLException {
+
+		todaysEventModel.clear();
+
+		todaysEventsList = new Query().getEventByDate(userEmail, cal.getDate(),
+				cal.getDate().getYear());
+
+		for (int i = 0; i < todaysEventsList.size(); i++) {
+			todaysEventModel.addElement(todaysEventsList.get(i));
+		}
+
+		weekModel.clear();
+
+		weekEvents = new Query().getThisWeeksEvents(userEmail, thisDate,
+				thisYear);
+
+		for (int j = 0; j < weekEvents.size(); j++) {
+			weekModel.addElement(weekEvents.get(j));
+
+		}
+
+		sentRequestModel.clear();
+
+		sentRequestListFromQuery = new Query().getSentInvitations(userEmail);
+
+		for (int i = 0; i < sentRequestListFromQuery.size(); i++) {
+			sentRequestModel.addElement(sentRequestListFromQuery.get(i));
+
+		}
+
+		recievedRequestModel.clear();
+
+		recievedRequestsListFromQuery = new Query()
+				.getRecievedInvitations(userEmail);
+
+		for (int i = 0; i < recievedRequestsListFromQuery.size(); i++) {
+			recievedRequestModel.addElement(recievedRequestsListFromQuery
+					.get(i));
+		}
+
+	}
+
+	public static void eventChangedAlert(int EventID) {
+
+		try {
+			Event e = new Query().getEventByID(EventID);
+			JOptionPane.showMessageDialog(null, "Event " + e.getTitle().trim()
+					+ " har blitt endret av eier");
+
+			updateMethod();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 	
+	public static void inviteAlert(){
+		
+		try {
+			JOptionPane.showMessageDialog(null, "Du har blitt invitert til ny event");
+
+			updateMethod();
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+	}
+
 	public String toDateLabel() {
 		return ("Avtaler for " + cal.getDate().getDate() + ". "
 				+ toMonth(cal.getDate().getMonth()) + " " + (cal.getDate()
@@ -419,11 +555,11 @@ public class MainProfileGUI extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
+
 			event = (Event) chosenDayEventList.getSelectedValue();
 
-			if (event.getAdminEmail().equals(Client.email)) {
-				try {
+			try {
+				if (event.getAdminEmail().equals(userEmail)) {
 
 					changeEventGUI.titleTextField.setText(event.getTitle());
 					changeEventGUI.descriptionTextField.setText(event
@@ -479,14 +615,16 @@ public class MainProfileGUI extends JPanel {
 
 					changingFrame.setVisible(true);
 
-				} catch (NullPointerException e2) {
-
-					JOptionPane.showMessageDialog(null, "Du må velge en event");
+				} else {
+					JOptionPane
+							.showMessageDialog(null,
+									"Du kan ikke endre denne eventen da du ikke opprettet den");
 				}
+			} catch (NullPointerException e2) {
 
-			}else{
-				JOptionPane.showMessageDialog(null, "Du kan ikke endre denne eventen da du ikke opprettet den");
+				JOptionPane.showMessageDialog(null, "Du må velge en event");
 			}
+
 		}
 	}
 
@@ -506,16 +644,52 @@ public class MainProfileGUI extends JPanel {
 						changeEventGUI.endDateChooser.getDate(),
 						changeEventGUI.endDateChooser.getDate().getYear());
 
-				String startTime = String
-						.valueOf(changeEventGUI.startTimeHourSpin.getValue())
-						+ ":"
-						+ String.valueOf(changeEventGUI.startTimeMinuteSpin
-								.getValue());
-				String endTime = String.valueOf(changeEventGUI.endTimeHourSpin
-						.getValue())
-						+ ":"
-						+ String.valueOf(changeEventGUI.endTimeMinuteSpin
-								.getValue());
+				String startTimeMinutes;
+
+				if ((Integer) changeEventGUI.startTimeMinuteSpin.getValue() < 10) {
+					startTimeMinutes = String.valueOf("0"
+							+ changeEventGUI.startTimeMinuteSpin.getValue());
+				} else {
+					startTimeMinutes = String
+							.valueOf(changeEventGUI.startTimeMinuteSpin
+									.getValue());
+				}
+
+				String startTimeHour;
+
+				if ((Integer) changeEventGUI.startTimeHourSpin.getValue() < 10) {
+					startTimeHour = String.valueOf("0"
+							+ changeEventGUI.startTimeHourSpin.getValue());
+				} else {
+					startTimeHour = String
+							.valueOf(changeEventGUI.startTimeHourSpin
+									.getValue());
+				}
+
+				String startTime = startTimeHour + ":" + startTimeMinutes;
+
+				String endTimeMinutes;
+
+				if ((Integer) changeEventGUI.endTimeMinuteSpin.getValue() < 10) {
+					endTimeMinutes = String.valueOf("0"
+							+ changeEventGUI.endTimeMinuteSpin.getValue());
+				} else {
+					endTimeMinutes = String
+							.valueOf(changeEventGUI.endTimeMinuteSpin
+									.getValue());
+				}
+
+				String endTimeHour;
+
+				if ((Integer) changeEventGUI.endTimeHourSpin.getValue() < 10) {
+					endTimeHour = String.valueOf("0"
+							+ changeEventGUI.endTimeHourSpin.getValue());
+				} else {
+					endTimeHour = String.valueOf(changeEventGUI.endTimeHourSpin
+							.getValue());
+				}
+
+				String endTime = endTimeHour + ":" + endTimeMinutes;
 
 				String place = changeEventGUI.placeField.getText();
 				String description = changeEventGUI.descriptionTextField
@@ -547,9 +721,67 @@ public class MainProfileGUI extends JPanel {
 						endDate, description, place, eventTypes, roomNr,
 						event.getID(), weekNr);
 
+				todaysEventModel.clear();
+
+				todaysEventsList = new Query().getEventByDate(userEmail,
+						cal.getDate(), cal.getDate().getYear());
+
+				for (int i = 0; i < todaysEventsList.size(); i++) {
+					todaysEventModel.addElement(todaysEventsList.get(i));
+				}
+
+				weekModel.clear();
+
+				weekEvents = new Query().getThisWeeksEvents(userEmail,
+						thisDate, thisYear);
+
+				for (int j = 0; j < weekEvents.size(); j++) {
+					weekModel.addElement(weekEvents.get(j));
+
+				}
+
+				sentRequestModel.clear();
+
+				sentRequestListFromQuery = new Query()
+						.getSentInvitations(userEmail);
+
+				for (int i = 0; i < sentRequestListFromQuery.size(); i++) {
+					sentRequestModel
+							.addElement(sentRequestListFromQuery.get(i));
+
+				}
+
+				recievedRequestModel.clear();
+
+				recievedRequestsListFromQuery = new Query()
+						.getRecievedInvitations(userEmail);
+
+				for (int i = 0; i < recievedRequestsListFromQuery.size(); i++) {
+					recievedRequestModel
+							.addElement(recievedRequestsListFromQuery.get(i));
+				}
+
+				Integer eventID = event.getID();
+
+				ArrayList<String> participantEmails = new ArrayList<String>();
+
+				for (int i = 0; i < participants.size(); i++) {
+					participantEmails.add(participants.get(i).getEmail());
+				}
+
+				ArrayList payload = new ArrayList();
+				payload.add(participantEmails);
+				payload.add(eventID);
+
+				Client.sock.sendMessage(new CommPack(
+						CommEnum.ALERTEVENTCHANGED, payload));
+
 			} catch (SQLException e1) {
 				System.out.println("error on update");
 				e1.printStackTrace();
+			} catch (ParseException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
 			}
 
 		}
@@ -591,16 +823,52 @@ public class MainProfileGUI extends JPanel {
 						addingEventGUI.endDateChooser.getDate(),
 						addingEventGUI.endDateChooser.getDate().getYear());
 
-				String startTime = String
-						.valueOf(addingEventGUI.startTimeHourSpin.getValue())
-						+ ":"
-						+ String.valueOf(addingEventGUI.startTimeMinuteSpin
-								.getValue());
-				String endTime = String.valueOf(addingEventGUI.endTimeHourSpin
-						.getValue())
-						+ ":"
-						+ String.valueOf(addingEventGUI.endTimeMinuteSpin
-								.getValue());
+				String startTimeMinutes;
+
+				if ((Integer) addingEventGUI.startTimeMinuteSpin.getValue() < 10) {
+					startTimeMinutes = String.valueOf("0"
+							+ addingEventGUI.startTimeMinuteSpin.getValue());
+				} else {
+					startTimeMinutes = String
+							.valueOf(addingEventGUI.startTimeMinuteSpin
+									.getValue());
+				}
+
+				String startTimeHour;
+
+				if ((Integer) addingEventGUI.startTimeHourSpin.getValue() < 10) {
+					startTimeHour = String.valueOf("0"
+							+ addingEventGUI.startTimeHourSpin.getValue());
+				} else {
+					startTimeHour = String
+							.valueOf(addingEventGUI.startTimeHourSpin
+									.getValue());
+				}
+
+				String startTime = startTimeHour + ":" + startTimeMinutes;
+
+				String endTimeMinutes;
+
+				if ((Integer) addingEventGUI.endTimeMinuteSpin.getValue() < 10) {
+					endTimeMinutes = String.valueOf("0"
+							+ addingEventGUI.endTimeMinuteSpin.getValue());
+				} else {
+					endTimeMinutes = String
+							.valueOf(addingEventGUI.endTimeMinuteSpin
+									.getValue());
+				}
+
+				String endTimeHour;
+
+				if ((Integer) addingEventGUI.endTimeHourSpin.getValue() < 10) {
+					endTimeHour = String.valueOf("0"
+							+ addingEventGUI.endTimeHourSpin.getValue());
+				} else {
+					endTimeHour = String.valueOf(addingEventGUI.endTimeHourSpin
+							.getValue());
+				}
+
+				String endTime = endTimeHour + ":" + endTimeMinutes;
 
 				String place = addingEventGUI.placeField.getText();
 				String description = addingEventGUI.descriptionTextField
@@ -627,7 +895,7 @@ public class MainProfileGUI extends JPanel {
 						addingEventGUI.startDateChooser.getDate(),
 						addingEventGUI.endDateChooser.getDate().getYear()));
 
-				Event event = new Event("@gmail.com", startDate, endDate,
+				Event event = new Event(userEmail, startDate, endDate,
 						startTime, endTime, place, description, title,
 						participants, eventTypes, roomNr, weekNr);
 
@@ -637,9 +905,8 @@ public class MainProfileGUI extends JPanel {
 
 				todaysEventModel.clear();
 
-				todaysEventsList = new Query().getEventByDate(Client.email,
+				todaysEventsList = new Query().getEventByDate(userEmail,
 						cal.getDate(), cal.getDate().getYear());
-				todaysEventModel.addElement(new String());
 
 				for (int i = 0; i < todaysEventsList.size(); i++) {
 					todaysEventModel.addElement(todaysEventsList.get(i));
@@ -647,14 +914,46 @@ public class MainProfileGUI extends JPanel {
 
 				weekModel.clear();
 
-				weekEvents = new Query().getThisWeeksEvents(Client.email,
+				weekEvents = new Query().getThisWeeksEvents(userEmail,
 						thisDate, thisYear);
-				weekModel.addElement(new String());
 
 				for (int j = 0; j < weekEvents.size(); j++) {
 					weekModel.addElement(weekEvents.get(j));
 
 				}
+
+				sentRequestModel.clear();
+
+				sentRequestListFromQuery = new Query()
+						.getSentInvitations(userEmail);
+
+				for (int i = 0; i < sentRequestListFromQuery.size(); i++) {
+					sentRequestModel
+							.addElement(sentRequestListFromQuery.get(i));
+
+				}
+
+				recievedRequestModel.clear();
+
+				recievedRequestsListFromQuery = new Query()
+						.getRecievedInvitations(userEmail);
+
+				for (int i = 0; i < recievedRequestsListFromQuery.size(); i++) {
+					recievedRequestModel
+							.addElement(recievedRequestsListFromQuery.get(i));
+				}
+				
+				
+				ArrayList<String> paricipantsEmail = new ArrayList<String>();
+				ArrayList payload = new ArrayList();
+				
+				for (int i = 0; i < participants.size(); i++) {
+					paricipantsEmail.add(participants.get(i).getEmail());
+				}
+				
+				payload.add(paricipantsEmail);
+				
+				Client.sock.sendMessage(new CommPack(CommEnum.ALERTEVENTINVITE,payload));
 
 			} catch (ParseException e2) {
 				System.out.println("klarer ikke regne ut weeknr   "
@@ -676,21 +975,20 @@ public class MainProfileGUI extends JPanel {
 			try {
 				Event event = (Event) chosenDayEventList.getSelectedValue();
 
-				if (event.getAdminEmail().equals(Client.email)) {
+				if (event.getAdminEmail().equals(userEmail)) {
 					if (JOptionPane.showConfirmDialog(null, "Vil du slette "
 							+ event.getTitle() + " ?", "Slette event?",
 							JOptionPane.YES_NO_OPTION,
 							JOptionPane.QUESTION_MESSAGE) == 0) {
 
 						((Query) new Query()).deleteEvent(event.getID(),
-								Client.email);
+								userEmail);
 
 						todaysEventModel.clear();
 
 						todaysEventsList = new Query().getEventByDate(
-								Client.email, cal.getDate(), cal.getDate()
+								userEmail, cal.getDate(), cal.getDate()
 										.getYear());
-						todaysEventModel.addElement(new String());
 
 						for (int i = 0; i < todaysEventsList.size(); i++) {
 							todaysEventModel
@@ -699,15 +997,23 @@ public class MainProfileGUI extends JPanel {
 
 						weekModel.clear();
 
-						weekEvents = new Query().getThisWeeksEvents(
-								Client.email, thisDate, thisYear);
-
-						weekModel.addElement(new String());
+						weekEvents = new Query().getThisWeeksEvents(userEmail,
+								thisDate, thisYear);
 
 						for (int j = 0; j < weekEvents.size(); j++) {
 							weekModel.addElement(weekEvents.get(j));
 						}
 
+						sentRequestModel.clear();
+
+						sentRequestListFromQuery = new Query()
+								.getSentInvitations(userEmail);
+
+						for (int i = 0; i < sentRequestListFromQuery.size(); i++) {
+							sentRequestModel
+									.addElement(sentRequestListFromQuery.get(i));
+
+						}
 					}
 				} else {
 					JOptionPane
@@ -774,7 +1080,55 @@ public class MainProfileGUI extends JPanel {
 
 		public void answerRequestViewer() {
 
-			JOptionPane.showConfirmDialog(null, "Ønsker du å delta?");
+			// int answer = JOptionPane.showMessageDialog(null,
+			// "Ønsker du å delta?", "Besvar innkalling", INTERG, greenIcon);
+			//
+			int answer = (JOptionPane.showConfirmDialog(null,
+					"Ønsker du å delta?", "Besvar innkalling",
+					JOptionPane.YES_NO_CANCEL_OPTION));
+			Event e = (Event) receivedRequestList.getSelectedValue();
+			try {
+				if (answer == 0) {
+					new Query().answerRequest(userEmail, e.getID(), 1);
+				} else if (answer == 1) {
+					new Query().answerRequest(userEmail, e.getID(), 2);
+				}
+
+				todaysEventModel.clear();
+
+				todaysEventsList = new Query().getEventByDate(userEmail,
+						cal.getDate(), cal.getDate().getYear());
+
+				for (int i = 0; i < todaysEventsList.size(); i++) {
+					todaysEventModel.addElement(todaysEventsList.get(i));
+				}
+
+				weekModel.clear();
+
+				weekEvents = new Query().getThisWeeksEvents(userEmail,
+						thisDate, thisYear);
+
+				for (int j = 0; j < weekEvents.size(); j++) {
+					weekModel.addElement(weekEvents.get(j));
+				}
+
+				recievedRequestModel.clear();
+
+				recievedRequestsListFromQuery = new Query()
+						.getRecievedInvitations(userEmail);
+
+				for (int i = 0; i < recievedRequestsListFromQuery.size(); i++) {
+					recievedRequestModel
+							.addElement(recievedRequestsListFromQuery.get(i));
+
+				}
+
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			} catch (ParseException e3) {
+				// TODO Auto-generated catch block
+				e3.printStackTrace();
+			}
 		}
 
 		@Override
@@ -812,9 +1166,8 @@ public class MainProfileGUI extends JPanel {
 				todaysEventModel.clear();
 				try {
 					ArrayList<Event> todaysEventsList = new Query()
-							.getEventByDate(Client.email, cal.getDate(), cal
+							.getEventByDate(userEmail, cal.getDate(), cal
 									.getDate().getYear());
-					todaysEventModel.addElement(new String());
 					for (int i = 0; i < todaysEventsList.size(); i++) {
 						todaysEventModel.addElement(todaysEventsList.get(i));
 					}
@@ -857,4 +1210,46 @@ public class MainProfileGUI extends JPanel {
 			return this;
 		}
 	}
+
+	public class EventRendererWithLogo extends JLabel implements
+			ListCellRenderer {
+
+		@Override
+		public Component getListCellRendererComponent(JList arg0, Object arg1,
+				int arg2, boolean isSelected, boolean arg4) {
+
+			try {
+				Event e = (Event) arg1;
+				if (e.getTitle().length() < 15
+						|| e.getDescription().length() < 15) {
+					e.setTitle(e.getTitle() + "                  ");
+					e.setDescription(e.getDescription() + "                  ");
+				}
+				setText(e.getTitle().substring(0, 15)
+						+ e.getDescription().substring(0, 15) + "  "
+						+ e.getStartTime() + "-" + e.getEndTime() + "    "
+						+ e.getStartDate().substring(0, 5));
+
+				if (isSelected) {
+					setForeground(Color.RED);
+				} else {
+					setForeground(Color.BLACK);
+				}
+
+				if (e.getAnswer() == 1) {
+					setIcon(greenIcon);
+				} else if (e.getAnswer() == 2) {
+					setIcon(redIcon);
+				} else {
+					setIcon(grayIcon);
+				}
+
+			} catch (Exception e) {
+				setText("Tittel                  Beskrivelse                 Tid ");
+			}
+
+			return this;
+		}
+	}
+
 }

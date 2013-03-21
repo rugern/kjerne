@@ -3,6 +3,8 @@ package GUI;
 import datamodell.Employee;
 import datamodell.EventMaker;
 import datamodell.Locale;
+import datamodell.Locales;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -13,6 +15,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -29,6 +32,8 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.toedter.calendar.JDateChooser;
 
@@ -74,8 +79,12 @@ public class AddingEventGUI extends JPanel {
 	JList chosenParticipants;
 	JList potensialParticipants;
 
+	DateToStringModifier dtsm = new DateToStringModifier();
+
 	DefaultListModel potensialEmployeesModel;
 	DefaultListModel chosenEmployeesModel;
+	DefaultComboBoxModel roomModel = new DefaultComboBoxModel();
+	ArrayList<Locale> localList;
 
 	public AddingEventGUI() {
 
@@ -87,7 +96,7 @@ public class AddingEventGUI extends JPanel {
 		westUpperPanel.setPreferredSize(new Dimension(70, 150));
 		westUpperPanel.setBackground(Color.WHITE);
 
-		JLabel title = new JLabel("Tittel");
+		JLabel titleLabel = new JLabel("Tittel");
 		JLabel descriptionLabel = new JLabel("Beskrivelse");
 		JLabel dateLabel = new JLabel("    Dato    ");
 		JLabel startTimeLabel = new JLabel("Starttid");
@@ -95,7 +104,7 @@ public class AddingEventGUI extends JPanel {
 		JLabel localeLabel = new JLabel("Rom / Sted");
 		JLabel type = new JLabel("Type");
 
-		westUpperPanel.add(title);
+		westUpperPanel.add(titleLabel);
 		westUpperPanel.add(descriptionLabel);
 		westUpperPanel.add(dateLabel);
 		westUpperPanel.add(startTimeLabel);
@@ -160,33 +169,92 @@ public class AddingEventGUI extends JPanel {
 		startTimeMinuteSpin = new JSpinner(new SpinnerNumberModel(0, 0, 59, 1));
 		JComponent startTimeMinuteField = ((JSpinner.DefaultEditor) ((JSpinner) startTimeMinuteSpin)
 				.getEditor());
+		startTimeMinuteSpin.addChangeListener(new dateTimeListener());
 		startTimeMinuteField.setPreferredSize(new Dimension(20, 12));
 
 		startTimeHourSpin = new JSpinner(new SpinnerNumberModel(10, 0, 23, 1));
+		startTimeHourSpin.addChangeListener(new dateTimeListener());
 		JComponent startTimeHourField = ((JSpinner.DefaultEditor) ((JSpinner) startTimeHourSpin)
 				.getEditor());
 		startTimeHourField.setPreferredSize(new Dimension(20, 12));
 
 		endTimeHourSpin = new JSpinner(new SpinnerNumberModel(10, 0, 23, 1));
+		endTimeHourSpin.addChangeListener(new dateTimeListener());
 		JComponent endTimeHourField = ((JSpinner.DefaultEditor) ((JSpinner) endTimeHourSpin)
 				.getEditor());
 		endTimeHourField.setPreferredSize(new Dimension(20, 12));
 
 		endTimeMinuteSpin = new JSpinner(new SpinnerNumberModel(0, 0, 59, 1));
+		endTimeMinuteSpin.addChangeListener(new dateTimeListener());
 		JComponent endtimeMinuteField = ((JSpinner.DefaultEditor) ((JSpinner) endTimeMinuteSpin)
 				.getEditor());
 		endtimeMinuteField.setPreferredSize(new Dimension(20, 12));
 
 		try {
 
-			DefaultComboBoxModel roomModel = new DefaultComboBoxModel();
+			startDateChooser.setDate(new Date());
+			startDateChooser
+					.addPropertyChangeListener(new dateAndTimeChanger());
+			endDateChooser.setDate(new Date());
+			endDateChooser.addPropertyChangeListener(new dateAndTimeChanger());
 
-			ArrayList<Locale> localList = new Query().getLocale();
+			String startDate = dtsm.getCompleteDate(startDateChooser.getDate(),
+					startDateChooser.getDate().getYear());
+			String endDate = dtsm.getCompleteDate(endDateChooser.getDate(),
+					endDateChooser.getDate().getYear());
+
+			String startTimeMinutes;
+
+			if ((Integer) startTimeMinuteSpin.getValue() < 10) {
+				startTimeMinutes = String.valueOf("0"
+						+ startTimeMinuteSpin.getValue());
+			} else {
+				startTimeMinutes = String.valueOf(startTimeMinuteSpin
+						.getValue());
+			}
+
+			String startTimeHour;
+
+			if ((Integer) startTimeHourSpin.getValue() < 10) {
+				startTimeHour = String.valueOf("0"
+						+ startTimeHourSpin.getValue());
+			} else {
+				startTimeHour = String.valueOf(startTimeHourSpin.getValue());
+			}
+
+			String startTime = startTimeHour + ":" + startTimeMinutes;
+
+			String endTimeMinutes;
+
+			if ((Integer) endTimeMinuteSpin.getValue() < 10) {
+				endTimeMinutes = String.valueOf("0"
+						+ endTimeMinuteSpin.getValue());
+			} else {
+				endTimeMinutes = String.valueOf(endTimeMinuteSpin.getValue());
+			}
+
+			String endTimeHour;
+
+			if ((Integer) endTimeHourSpin.getValue() < 10) {
+				endTimeHour = String.valueOf("0" + endTimeHourSpin.getValue());
+			} else {
+				endTimeHour = String.valueOf(endTimeHourSpin.getValue());
+			}
+
+			String endTime = endTimeHour + ":" + endTimeMinutes;
+
+			ArrayList<EventMaker> participants = new ArrayList<EventMaker>();
+
+			ArrayList<Locale> localList = new Locales().getLocales(startTime,
+					startDate, endTime, endDate);
+
+			new Locales().getLocales(startTime, startDate, endTime, endDate);
 
 			for (int i = 0; i < localList.size(); i++) {
 				roomModel.addElement(localList.get(i));
+				roomSelecter = new JComboBox(roomModel);
+
 			}
-			roomSelecter = new JComboBox(roomModel);
 			roomSelecter.setRenderer(new roomRenderer());
 			roomSelecter.setPreferredSize(new Dimension(80, 16));
 
@@ -238,7 +306,6 @@ public class AddingEventGUI extends JPanel {
 		leftEastCentePanel.add(chosenParticipantsScrollPane);
 
 		// CenterEastCentePanel
-
 		centerEastCenterPanel = new JPanel();
 		centerEastCenterPanel.setPreferredSize(new Dimension(70, 70));
 		centerEastCenterPanel.setBackground(Color.WHITE);
@@ -259,16 +326,16 @@ public class AddingEventGUI extends JPanel {
 		rightEastCenterPanel.setPreferredSize(new Dimension(110, 140));
 		rightEastCenterPanel.setBackground(Color.WHITE);
 
+		potensialEmployeesModel = new DefaultListModel();
+		ArrayList<Employee> employees;
 		try {
-			potensialEmployeesModel = new DefaultListModel();
-			ArrayList<Employee> employees = new Query().getEmployees();
-
+			employees = new Query().getEmployees();
 			for (int i = 0; i < employees.size(); i++) {
 				potensialEmployeesModel.addElement(employees.get(i));
 			}
-
 		} catch (SQLException e) {
-			System.out.println("SQL error on getEmployees");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		potensialParticipants = new JList(potensialEmployeesModel);
@@ -360,10 +427,9 @@ public class AddingEventGUI extends JPanel {
 
 	public class ParticipantAdministrater implements ActionListener {
 
-		
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
+
 			if (e.getSource() == addParticipant
 					&& potensialEmployeesModel.size() > 0) {
 
@@ -382,7 +448,7 @@ public class AddingEventGUI extends JPanel {
 				chosenEmployeesModel.removeElement(temp_EventMaker);
 
 			}
-			
+
 			chosenParticipants.setSelectedIndex(0);
 			potensialParticipants.setSelectedIndex(0);
 
@@ -428,6 +494,153 @@ public class AddingEventGUI extends JPanel {
 			}
 
 			return this;
+		}
+
+	}
+
+	public class dateAndTimeChanger implements PropertyChangeListener {
+
+		@Override
+		public void propertyChange(PropertyChangeEvent arg0) {
+
+			String startDate = dtsm.getCompleteDate(startDateChooser.getDate(),
+					startDateChooser.getDate().getYear());
+			String endDate = dtsm.getCompleteDate(endDateChooser.getDate(),
+					endDateChooser.getDate().getYear());
+
+			String startTimeMinutes;
+
+			if ((Integer) startTimeMinuteSpin.getValue() < 10) {
+				startTimeMinutes = String.valueOf("0"
+						+ startTimeMinuteSpin.getValue());
+			} else {
+				startTimeMinutes = String.valueOf(startTimeMinuteSpin
+						.getValue());
+			}
+
+			String startTimeHour;
+
+			if ((Integer) startTimeHourSpin.getValue() < 10) {
+				startTimeHour = String.valueOf("0"
+						+ startTimeHourSpin.getValue());
+			} else {
+				startTimeHour = String.valueOf(startTimeHourSpin.getValue());
+			}
+
+			String startTime = startTimeHour + ":" + startTimeMinutes;
+
+			String endTimeMinutes;
+
+			if ((Integer) endTimeMinuteSpin.getValue() < 10) {
+				endTimeMinutes = String.valueOf("0"
+						+ endTimeMinuteSpin.getValue());
+			} else {
+				endTimeMinutes = String.valueOf(endTimeMinuteSpin.getValue());
+			}
+
+			String endTimeHour;
+
+			if ((Integer) endTimeHourSpin.getValue() < 10) {
+				endTimeHour = String.valueOf("0" + endTimeHourSpin.getValue());
+			} else {
+				endTimeHour = String.valueOf(endTimeHourSpin.getValue());
+			}
+
+			String endTime = endTimeHour + ":" + endTimeMinutes;
+
+			ArrayList<EventMaker> participants = new ArrayList<EventMaker>();
+
+			System.out.println(roomModel.getSize());
+			roomModel.removeAllElements();
+			System.out.println(roomModel.getSize());
+
+			try {
+				localList = new Locales().getLocales(startTime, startDate,
+						endTime, endDate);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			for (int i = 0; i < localList.size(); i++) {
+				roomModel.addElement(localList.get(i));
+
+			}
+
+		}
+	}
+
+	public class dateTimeListener implements ChangeListener {
+
+		@Override
+		public void stateChanged(ChangeEvent e) {
+
+			String startDate = dtsm.getCompleteDate(startDateChooser.getDate(),
+					startDateChooser.getDate().getYear());
+			String endDate = dtsm.getCompleteDate(endDateChooser.getDate(),
+					endDateChooser.getDate().getYear());
+
+			String startTimeMinutes;
+
+			if ((Integer) startTimeMinuteSpin.getValue() < 10) {
+				startTimeMinutes = String.valueOf("0"
+						+ startTimeMinuteSpin.getValue());
+			} else {
+				startTimeMinutes = String.valueOf(startTimeMinuteSpin
+						.getValue());
+			}
+
+			String startTimeHour;
+
+			if ((Integer) startTimeHourSpin.getValue() < 10) {
+				startTimeHour = String.valueOf("0"
+						+ startTimeHourSpin.getValue());
+			} else {
+				startTimeHour = String.valueOf(startTimeHourSpin.getValue());
+			}
+
+			String startTime = startTimeHour + ":" + startTimeMinutes;
+
+			String endTimeMinutes;
+
+			if ((Integer) endTimeMinuteSpin.getValue() < 10) {
+				endTimeMinutes = String.valueOf("0"
+						+ endTimeMinuteSpin.getValue());
+			} else {
+				endTimeMinutes = String.valueOf(endTimeMinuteSpin.getValue());
+			}
+
+			String endTimeHour;
+
+			if ((Integer) endTimeHourSpin.getValue() < 10) {
+				endTimeHour = String.valueOf("0" + endTimeHourSpin.getValue());
+			} else {
+				endTimeHour = String.valueOf(endTimeHourSpin.getValue());
+			}
+
+			String endTime = endTimeHour + ":" + endTimeMinutes;
+
+			ArrayList<EventMaker> participants = new ArrayList<EventMaker>();
+
+			System.out.println(roomModel.getSize());
+			roomModel.removeAllElements();
+			System.out.println(roomModel.getSize());
+
+			try {
+				localList = new Locales().getLocales(startTime, startDate,
+						endTime, endDate);
+			} catch (SQLException e3) {
+				// TODO Auto-generated catch block
+				e3.printStackTrace();
+			}
+
+			for (int i = 0; i < localList.size(); i++) {
+				roomModel.addElement(localList.get(i));
+
+			}
+			roomSelecter.setRenderer(new roomRenderer());
+			roomSelecter.setPreferredSize(new Dimension(80, 16));
+
 		}
 
 	}

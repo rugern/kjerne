@@ -152,4 +152,9 @@ public class ServerThread extends Thread
 		al.add(eventID);
 		sendMessage(new CommPack(CommEnum.ALERTRECEIVED, al));
 	}
+	
+	public void inviteAlert(){
+		sendMessage(new CommPack(CommEnum.INVITEALERTRECIEVED, null));
+	}
 }
+	

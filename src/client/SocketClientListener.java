@@ -48,7 +48,7 @@ public class SocketClientListener extends Thread
 				System.out.println(reply.getMessageName()+" :"+reply.getParamList());
 				latest = reply;
 
-				Client.cph.handlePacket(reply); //calls appropriate method according to header
+				client.ClientPacketHandler.handlePacket(reply); //calls appropriate method according to header
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
